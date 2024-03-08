@@ -1,5 +1,5 @@
-# AD1-mounter
-I hate AD1 format for its windows exclusivity so i wrote a mount utility for linux
+# AD1-tools
+I hate AD1 format for its windows exclusivity so i wrote a utilities for linux.
 
 
 ## Acknowledgemens 
