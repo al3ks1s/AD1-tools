@@ -122,7 +122,7 @@ recurse_md5(FILE* ad1_file, ad1_item_header* item) {
 
     int ret;
 
-    if (item->item_type == 0) {
+    if (item->item_type != AD1_FOLDER_SIGNATURE) {
         ret = check_md5(ad1_file, item);
 
         switch (ret) {
@@ -147,7 +147,7 @@ int
 recurse_sha1(FILE* ad1_file, ad1_item_header* item) {
     int ret;
 
-    if (item->item_type == 0) {
+    if (item->item_type != AD1_FOLDER_SIGNATURE) {
         ret = check_sha1(ad1_file, item);
 
         switch (ret) {
