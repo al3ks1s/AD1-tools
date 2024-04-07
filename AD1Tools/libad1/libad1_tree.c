@@ -80,20 +80,24 @@ build_item_tree(FILE* ad1_file, ad1_logical_header* logical_header) {
 void
 free_all(ad1_segment_header* segment_header, ad1_logical_header* logical_header) {
 
-    free(segment_header);
-    segment_header = NULL;
+    if (segment_header != 0) {
+        free(segment_header);
+        segment_header = NULL;
+    }
 
-    free_item(logical_header->first_item);
-    logical_header->first_item = 0;
+    if (logical_header != 0) {
+        free_item(logical_header->first_item);
+        logical_header->first_item = 0;
 
-    free_metadata(logical_header->logical_metadata);
-    logical_header->logical_metadata = 0;
+        free_metadata(logical_header->logical_metadata);
+        logical_header->logical_metadata = 0;
 
-    free(logical_header->data_source_name);
-    logical_header->data_source_name = 0;
+        free(logical_header->data_source_name);
+        logical_header->data_source_name = 0;
 
-    free(logical_header);
-    logical_header = 0;
+        free(logical_header);
+        logical_header = 0;
+    }
 }
 
 void

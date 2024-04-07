@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "libad1_definitions.h"
+#include "libad1_hash.h"
 #include "libad1_reader.h"
 
 void build_next_metadata(FILE* ad1_file, ad1_metadata* parent_metadata);

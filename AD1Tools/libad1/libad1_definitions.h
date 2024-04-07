@@ -82,7 +82,7 @@ typedef struct ad1_logical_header {
 
 enum category { HASH_INFO = 0x01, ITEM_TYPE = 0x02, ITEM_SIZE = 0x03, WINDOWS_FLAGS = 0x04, TIMESTAMP = 0x05 };
 
-enum ad_hash_key { MD5 = 0x5001, SHA1 = 0x5002, DATA_SOURCE_NAME = 0x10002 };
+enum ad_hash_key { MD5_HASH = 0x5001, SHA1_HASH = 0x5002, DATA_SOURCE_NAME = 0x10002 };
 
 enum ad_item_type_key { UNKNOWN = 0x01, CHAR_ITEM_TYPE = 0x02 };
 
@@ -95,7 +95,7 @@ enum ad_item_type_value {
     SYMLINK = 0x39
 };
 
-enum ad_item_size_key { FILE_SiZE = 0x03, MAX_SIZE = 0x04, UNKNOWN_1 = 0x2002, UNKNOWN_2 = 0x2003 };
+enum ad_item_size_key { FILE_SIZE = 0x03, MAX_SIZE = 0x04, UNKNOWN_1 = 0x2002, UNKNOWN_2 = 0x2003 };
 
 enum ad_windows_flag_key {
     ENCRYPTED = 0x0D,

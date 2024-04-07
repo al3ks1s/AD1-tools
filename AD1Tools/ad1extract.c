@@ -64,7 +64,11 @@ main(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    printf("%s", arguments.ad1_file_path);
+    ad1_session* session;
+
+    session = open_ad1_session(arguments.ad1_file_path);
+
+    close_ad1_session(session);
 
     return 0;
 }

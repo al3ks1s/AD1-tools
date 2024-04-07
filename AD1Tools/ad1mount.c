@@ -53,16 +53,20 @@ main(int argc, char* argv[]) {
     argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
     if (!arguments.ad1_file_path) {
-        argp_help(&argp, stdout, ARGP_HELP_USAGE, "ad1verify");
+        argp_help(&argp, stdout, ARGP_HELP_USAGE, "ad1mount");
         exit(EXIT_FAILURE);
     }
 
     if (!arguments.mount_dir) {
-        argp_help(&argp, stdout, ARGP_HELP_USAGE, "ad1verify");
+        argp_help(&argp, stdout, ARGP_HELP_USAGE, "ad1mount");
         exit(EXIT_FAILURE);
     }
 
-    printf("%s", arguments.ad1_file_path);
+    ad1_session* session;
+
+    session = open_ad1_session(arguments.ad1_file_path);
+
+    close_ad1_session(session);
 
     return 0;
 }

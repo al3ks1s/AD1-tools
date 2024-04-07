@@ -67,7 +67,8 @@ read_segmented_header(FILE* ad1_file) {
 
     if (strcmp(segment_header->signature, "ADSEGMENTEDFILE")) {
         printf("The file is not of AD1 format.\n");
-        exit(EXIT_FAILURE);
+        free(segment_header);
+        return 0;
     }
 
     segment_header->segment_index = read_int_little_endian(ad1_file, 0x18);

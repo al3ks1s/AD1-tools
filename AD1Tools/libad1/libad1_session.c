@@ -21,6 +21,12 @@ open_ad1_session(char* filepath) {
     }
 
     session->segment_header = read_segmented_header(session->ad1_file);
+
+    if (session->segment_header == 0) {
+        close_ad1_session(session);
+        exit(EXIT_FAILURE);
+    }
+
     session->logical_header = read_logical_header(session->ad1_file);
 
     build_item_tree(session->ad1_file, session->logical_header);

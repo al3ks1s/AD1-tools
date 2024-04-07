@@ -19,17 +19,17 @@ print_logical_header(ad1_logical_header* logical_header) {
 
     printf("\n");
 
-    printf("Signature \t: %s\n", logical_header->signature);
-    printf("Version   \t: %d\n", logical_header->image_version);
-    printf("Zlib size \t: %d\n", logical_header->zlib_chunk_size);
-    printf("Metadata  \t: %016lx\n", logical_header->logical_metadata_addr);
-    printf("First data \t: %016lx\n", logical_header->first_item_addr);
-    printf("Name length  \t: %d\n", logical_header->data_source_name_length);
-    printf("Signature \t: %s\n", logical_header->ad_signature);
-    printf("Data address \t: %016lx\n", logical_header->data_source_name_addr);
-    printf("Footer 1  \t: %016lx\n", logical_header->attrguid_footer_addr);
-    printf("Footer 2  \t: %016lx\n", logical_header->locsguid_footer_addr);
-    printf("Data name \t: %s\n", logical_header->data_source_name);
+    printf("Signature \t\t\t: %s\n", logical_header->signature);
+    printf("Version   \t\t\t: %d\n", logical_header->image_version);
+    printf("Zlib chunk size \t\t: %d\n", logical_header->zlib_chunk_size);
+    printf("Metadata address \t\t: %016lx\n", logical_header->logical_metadata_addr);
+    printf("First data address \t\t: %016lx\n", logical_header->first_item_addr);
+    printf("Data source name length  \t: %d\n", logical_header->data_source_name_length);
+    printf("Signature \t\t\t: %s\n", logical_header->ad_signature);
+    printf("Data source name address \t: %016lx\n", logical_header->data_source_name_addr);
+    printf("ATTRGUID Footer address \t: %016lx\n", logical_header->attrguid_footer_addr);
+    printf("LOCSGUID Footer address \t: %016lx\n", logical_header->locsguid_footer_addr);
+    printf("Data source name \t\t: %s\n", logical_header->data_source_name);
 }
 
 void
@@ -39,7 +39,7 @@ print_item_header(ad1_item_header* item_header) {
 
     printf("Next item \t: %016lx\n", item_header->next_item_addr);
     printf("First child \t: %016lx\n", item_header->first_child_addr);
-    printf("metadata addr \t: %016lx\n", item_header->first_metadata_addr);
+    printf("Metadata addr \t: %016lx\n", item_header->first_metadata_addr);
     printf("Zlib data addr \t: %016lx\n", item_header->zlib_metadata_addr);
     printf("Decomp size \t: %ld\n", item_header->decompressed_size);
     printf("Item type \t: %d\n", item_header->item_type);
@@ -95,6 +95,7 @@ print_tree(ad1_item_header* local_root_header, int cur_depth_level) {
     return;
 }
 
+// Pretty much useless now
 void
 print_paths(ad1_item_header* local_root_header) {
 
@@ -114,6 +115,7 @@ print_paths(ad1_item_header* local_root_header) {
     }
 }
 
+// Pretty much useless now
 void
 print_parent(ad1_item_header* parent) {
     if (parent->parent != NULL) {

@@ -1,6 +1,8 @@
 #include "libad1_file_reader.h"
+#include <openssl/md5.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <zlib.h>
 
 unsigned char*
@@ -9,6 +11,11 @@ read_file_data(FILE* ad1_file, ad1_item_header* ad1_item) {
     unsigned long chunk_numbers;
     unsigned char* file_data = NULL;
     unsigned long data_index = 0;
+
+    if (ad1_item->decompressed_size == 0) {
+        file_data = (unsigned char*)calloc(1, sizeof(unsigned char));
+        return file_data;
+    }
 
     file_data = (unsigned char*)calloc(ad1_item->decompressed_size, sizeof(unsigned char));
 
@@ -67,9 +74,6 @@ zlib_inflate(unsigned char* compressed_data, unsigned int compressed_data_size, 
     strm.avail_in = 0;
     strm.next_in = Z_NULL;
     ret = inflateInit(&strm);
-    if (ret != Z_OK) {
-        return ret;
-    }
 
     strm.avail_in = compressed_data_size;
     strm.next_in = compressed_data;
