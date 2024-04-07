@@ -62,7 +62,7 @@ check_md5(FILE* ad1_file, ad1_item_header* item) {
 
     metadata = item->first_metadata;
 
-    while (metadata->category != HASH_INFO || metadata->key != MD5_HASH) {
+    while (metadata->next_metadata != 0 && (metadata->category != HASH_INFO || metadata->key != MD5_HASH)) {
         metadata = metadata->next_metadata;
     }
 
@@ -94,7 +94,7 @@ check_sha1(FILE* ad1_file, ad1_item_header* item) {
 
     metadata = item->first_metadata;
 
-    while ((metadata->category != HASH_INFO || metadata->key != SHA1_HASH)) {
+    while (metadata->next_metadata != 0 && (metadata->category != HASH_INFO || metadata->key != SHA1_HASH)) {
         metadata = metadata->next_metadata;
     }
 
@@ -167,3 +167,9 @@ recurse_sha1(FILE* ad1_file, ad1_item_header* item) {
 
     return ret;
 }
+
+void
+check_file_md5(FILE* ad1_file) {}
+
+void
+check_file_sha1(FILE* ad1_file) {}

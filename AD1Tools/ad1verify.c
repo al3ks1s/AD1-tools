@@ -64,6 +64,18 @@ main(int argc, char* argv[]) {
 
     session = open_ad1_session(arguments.ad1_file_path);
 
+    if (arguments.full_check) {
+        if (!arguments.sha1) {
+            printf("Starting md5 check for all files.\n");
+            recurse_md5(session->ad1_file, session->logical_header->first_item);
+        } else {
+            printf("Starting sha1 check for all files.\n");
+            recurse_sha1(session->ad1_file, session->logical_header->first_item);
+        }
+    } else {
+        printf("Not in yet\n");
+    }
+
     close_ad1_session(session);
 
     return 0;

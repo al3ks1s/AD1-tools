@@ -8,6 +8,7 @@
 #include "libad1/libad1_tree.h"
 
 #include <argp.h>
+
 static error_t parse_opt(int key, char* arg, struct argp_state* state);
 
 #endif

@@ -15,7 +15,7 @@ static struct argp_option options[] = {
     {"metadata", 'm', 0, OPTION_ARG_OPTIONAL, "Apply metadatas to extracted files (eg: timestamps)."},
     {"quiet", 'q', 0, OPTION_ARG_OPTIONAL, "Produce a quiet output."},
     {"output-dir", 'd', "DIR", 0, "Directory to extract the files to."},
-    {"input", 'i', "FILE", 0, "Inout AD1 file."},
+    {"input", 'i', "FILE", 0, "Input AD1 file."},
     {0}};
 
 struct arguments {
@@ -60,6 +60,11 @@ main(int argc, char* argv[]) {
     argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
     if (!arguments.ad1_file_path) {
+        argp_help(&argp, stdout, ARGP_HELP_USAGE, "ad1verify");
+        exit(EXIT_FAILURE);
+    }
+
+    if (!arguments.output_dir) {
         argp_help(&argp, stdout, ARGP_HELP_USAGE, "ad1verify");
         exit(EXIT_FAILURE);
     }

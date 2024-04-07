@@ -42,7 +42,7 @@ static struct arguments arguments;
 
 void
 print_info(ad1_session* session) {
-    printf("%s\n\n", argp_program_version);
+    printf("%s\n", argp_program_version);
     printf("\n");
     printf("AD1 Segments info");
     print_segment_header(session->segment_header);

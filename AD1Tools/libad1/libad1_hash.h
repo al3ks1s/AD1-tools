@@ -28,5 +28,9 @@ int recurse_md5(FILE* ad1_file, ad1_item_header* item);
 
 int recurse_sha1(FILE* ad1_file, ad1_item_header* item);
 
+void check_file_md5(FILE* ad1_file);
+
+void check_file_sha1(FILE* ad1_file);
+
 enum hash_check { HASH_OK, HASH_NOK, HASH_ERR };
 #endif
