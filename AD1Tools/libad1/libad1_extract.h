@@ -12,7 +12,7 @@
 
 void extract_all(ad1_session* session, const char* output_dir);
 
-void extract_file(FILE* ad1_file, ad1_item_header* item, const char* root_folder);
+void extract_file(FILE* ad1_file, ad1_item_header* item, const char* output_dir);
 
 void apply_metadata(FILE* output_file, ad1_metadata* metadata);
 
