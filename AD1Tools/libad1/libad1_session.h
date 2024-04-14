@@ -10,6 +10,7 @@
 typedef struct ad1_session {
     ad1_segment_header* segment_header;
     ad1_logical_header* logical_header;
+    ad1_item_header* first_item;
     FILE* ad1_file;
 } ad1_session;
 

@@ -135,6 +135,13 @@ read_item(FILE* ad1_file, unsigned long offset) {
     item_header->item_name = (char*)calloc(item_header->item_name_length + 1, sizeof(char));
     read_ad1_string(ad1_file, item_header->item_name, item_header->item_name_length, offset + 0x30);
 
+    // Transforming slashes into underscores so that it doesn't mess up file paths on extraction or mounting
+    for (int i = 0; i < item_header->item_name_length; i++) {
+        if (item_header->item_name[i] == 47) {
+            item_header->item_name[i] = 95;
+        }
+    }
+
     item_header->parent_folder = read_long_little_endian(ad1_file, offset + 0x30 + item_header->item_name_length);
 
     return item_header;

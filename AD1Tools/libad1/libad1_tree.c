@@ -170,7 +170,9 @@ build_item_path(ad1_item_header* item) {
 
     path = (char*)calloc(path_length + 1, sizeof(char));
 
-    recurse_item_path(item->parent, path);
+    if (item->parent != NULL) {
+        recurse_item_path(item->parent, path);
+    }
 
     memcpy(path + path_length - item->item_name_length, item->item_name, item->item_name_length);
 
