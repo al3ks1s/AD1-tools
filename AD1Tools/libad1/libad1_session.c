@@ -31,8 +31,6 @@ open_ad1_session(char* filepath) {
 
     build_item_tree(session->ad1_file, session->logical_header);
 
-    session->first_item = session->logical_header->first_item;
-
     return session;
 }
 
