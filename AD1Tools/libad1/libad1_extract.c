@@ -107,3 +107,7 @@ extract_file(FILE* ad1_file, ad1_item_header* item, const char* output_dir) {
         extract_file(ad1_file, item->next_item, output_dir);
     }
 }
+
+void
+apply_metadata(FILE* output_file, ad1_metadata* metadata) {
+    do { } while (metadata->next_metadata != NULL); }

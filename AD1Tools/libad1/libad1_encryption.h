@@ -1,5 +1,5 @@
-#ifndef AD1_ENCRYPT_H
-#define AD1_ENCRYPT_H
+#ifndef LIBAD1_ENCRYPT_H
+#define LIBAD1_ENCRYPT_H
 
 struct ad1_encrypted_header {
     char signature[8];

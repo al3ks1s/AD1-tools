@@ -76,7 +76,7 @@ main(int argc, char* argv[]) {
 
     session = open_ad1_session(arguments.ad1_file_path);
 
-    extract_all(session, arguments.output_dir, arguments.integrity_check);
+    extract_all(session, arguments.output_dir);
 
     close_ad1_session(session);
 

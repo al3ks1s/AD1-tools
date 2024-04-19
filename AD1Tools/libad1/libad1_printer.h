@@ -1,5 +1,5 @@
-#ifndef AD1_PRINTER_H
-#define AD1_PRINTER_H
+#ifndef LIBAD1_PRINTER_H
+#define LIBAD1_PRINTER_H
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,5 +1,5 @@
-#ifndef AD1_SESSION_H
-#define AD1_SESSION_H
+#ifndef LIBAD1_SESSION_H
+#define LIBAD1_SESSION_H
 
 #include <stdio.h>
 #include "libad1_definitions.h"

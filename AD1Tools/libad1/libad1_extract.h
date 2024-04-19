@@ -1,5 +1,5 @@
-#ifndef AD1_EXTRACT_H
-#define AD1_EXTRACT_H
+#ifndef LIBAD1_EXTRACT_H
+#define LIBAD1_EXTRACT_H
 
 #include <stdbool.h>
 #include <stdio.h>

@@ -1,5 +1,5 @@
-#ifndef AD1_READER_H
-#define AD1_READER_H
+#ifndef LIBAD1_READER_H
+#define LIBAD1_READER_H
 
 #include <stdio.h>
 #include "libad1_definitions.h"

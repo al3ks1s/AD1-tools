@@ -1,5 +1,5 @@
-#ifndef AD1_HASH_H
-#define AD1_HASH_H
+#ifndef LIBAD1_HASH_H
+#define LIBAD1_HASH_H
 
 #include <openssl/evp.h>
 #include <openssl/md5.h>

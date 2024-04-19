@@ -1,5 +1,5 @@
-#ifndef AD1_TREE_H
-#define AD1_TREE_H
+#ifndef LIBAD1_TREE_H
+#define LIBAD1_TREE_H
 
 #include <stdio.h>
 #include <stdlib.h>

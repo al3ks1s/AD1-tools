@@ -1,5 +1,5 @@
-#ifndef AD1_FILE_READER_H
-#define AD1_FILE_READER_H
+#ifndef LIBAD1_FILE_READER_H
+#define LIBAD1_FILE_READER_H
 
 #include <assert.h>
 #include <stdio.h>

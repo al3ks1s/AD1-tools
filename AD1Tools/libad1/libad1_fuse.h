@@ -1,4 +1,4 @@
-#ifndef AD1_FUSE_H
-#define AD1_FUSE_H
+#ifndef LIBAD1_FUSE_H
+#define LIBAD1_FUSE_H
 
 #endif
