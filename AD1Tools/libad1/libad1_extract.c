@@ -1,10 +1,15 @@
-#include "libad1_extract.h"
+#define _XOPEN_SOURCE 700
+#include <time.h>
+
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/time.h>
+#include <utime.h>
+#include "libad1_extract.h"
 
 void
 extract_all(ad1_session* session, const char* output_dir) {
@@ -93,6 +98,8 @@ extract_file(FILE* ad1_file, ad1_item_header* item, const char* output_dir) {
         free(file_data);
     }
 
+    apply_metadata(complete_path, item->first_metadata);
+
     free(local_item_path);
     local_item_path = NULL;
 
@@ -109,5 +116,39 @@ extract_file(FILE* ad1_file, ad1_item_header* item, const char* output_dir) {
 }
 
 void
-apply_metadata(FILE* output_file, ad1_metadata* metadata) {
-    do { } while (metadata->next_metadata != NULL); }
+apply_metadata(const char* item_path, ad1_metadata* metadata) {
+
+    struct timeval times[2] = {0};
+
+    while (metadata != NULL) {
+
+        switch (metadata->category) {
+            case HASH_INFO: break;
+            case ITEM_TYPE: break;
+            case ITEM_SIZE: break;
+            case WINDOWS_FLAGS: break;
+            case TIMESTAMP:
+                switch (metadata->key) {
+                    case ACCESS: parse_timestamp(times, metadata->data); break;
+                    case CHANGE: break;
+                    case MODIFIED: parse_timestamp(times + 1, metadata->data); break;
+                };
+        }
+
+        metadata = metadata->next_metadata;
+    };
+
+    utimes(item_path, times);
+}
+
+void
+parse_timestamp(struct timeval* time, const char* time_s) {
+
+    struct tm time_tm;
+
+    strptime(time_s, "%Y%m%dT%H%M%S", &time_tm);
+
+    time->tv_sec = mktime(&time_tm);
+
+    return;
+}
