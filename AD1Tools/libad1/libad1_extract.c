@@ -1,13 +1,13 @@
 #define _XOPEN_SOURCE 700
-#include <time.h>
-
 #include <errno.h>
+#include <fcntl.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#include <time.h>
 #include <utime.h>
 #include "libad1_extract.h"
 
@@ -66,18 +66,20 @@ extract_file(FILE* ad1_file, ad1_item_header* item, const char* output_dir) {
             complete_path = NULL;
 
             switch (errno) {
-                case EACCES: printf("You don't have access to %s.", complete_path); return;
-                case ELOOP: printf("Symlink loop on %s.\n", complete_path); return;
-                case EMLINK: printf("Link count exceeds max link count for path %s.\n", complete_path); return;
+                case EACCES: printf("You don't have access to %s.", complete_path); break;
+                case ELOOP: printf("Symlink loop on %s.\n", complete_path); break;
+                case EMLINK: printf("Link count exceeds max link count for path %s.\n", complete_path); break;
                 case EEXIST: break;
                 case ENAMETOOLONG:
                     printf("Path length exceeds %d or a compondent length exceeds %d\n.", PATH_MAX, NAME_MAX);
-                    return;
-                case ENOENT: printf("Parent path for %s does not exists.\n", item->item_name); return;
-                case ENOTDIR: printf("Parent path for %s not a directory.\n", item->item_name); return;
-                case EROFS: printf("Filesystem is read-only.\n"); return;
-                case ENOSPC: printf("Not enough space on the filesystem to create directory.\n"); return;
+                    break;
+                case ENOENT: printf("Parent path for %s does not exists.\n", item->item_name); break;
+                case ENOTDIR: printf("Parent path for %s not a directory.\n", item->item_name); break;
+                case EROFS: printf("Filesystem is read-only.\n"); break;
+                case ENOSPC: printf("Not enough space on the filesystem to create directory.\n"); break;
             }
+
+            return;
         }
     } else if (item->item_type == 0) {
         unsigned char* file_data;
@@ -118,7 +120,7 @@ extract_file(FILE* ad1_file, ad1_item_header* item, const char* output_dir) {
 void
 apply_metadata(const char* item_path, ad1_metadata* metadata) {
 
-    struct timeval times[2] = {0};
+    struct timespec times[2] = {0};
 
     while (metadata != NULL) {
 
@@ -138,11 +140,12 @@ apply_metadata(const char* item_path, ad1_metadata* metadata) {
         metadata = metadata->next_metadata;
     };
 
-    utimes(item_path, times);
+    utimensat(AT_FDCWD, item_path, times, 0);
+    //utimes(item_path, times);
 }
 
 void
-parse_timestamp(struct timeval* time, const char* time_s) {
+parse_timestamp(struct timespec* time, const char* time_s) {
 
     struct tm time_tm;
 

@@ -7,7 +7,7 @@
 #include <zlib.h>
 #include "libad1/libad1_extract.h"
 
-const char* argp_program_version = "ad1extract v.0.0.1";
+const char* argp_program_version = "ad1extract v.0.1.0";
 const char* argp_program_bug_address = "<al3ks1sss@gmail.com> or https://github.com/al3ks1s/AD1-tools/issues";
 static char doc[] = "Extract the content of an AccessData AD1 Logical Image.";
 static char args_doc[] = "ad1extract [OPTIONS] -i FILENAME";
@@ -63,12 +63,12 @@ main(int argc, char* argv[]) {
     argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
     if (!arguments.ad1_file_path) {
-        argp_help(&argp, stdout, ARGP_HELP_USAGE, "ad1verify");
+        argp_help(&argp, stdout, ARGP_HELP_USAGE, "ad1extract");
         exit(EXIT_FAILURE);
     }
 
     if (!arguments.output_dir) {
-        argp_help(&argp, stdout, ARGP_HELP_USAGE, "ad1verify");
+        argp_help(&argp, stdout, ARGP_HELP_USAGE, "ad1extract");
         exit(EXIT_FAILURE);
     }
 

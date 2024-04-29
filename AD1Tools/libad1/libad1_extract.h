@@ -16,6 +16,6 @@ void extract_file(FILE* ad1_file, ad1_item_header* item, const char* output_dir)
 
 void apply_metadata(const char* item_path, ad1_metadata* metadata);
 
-void parse_timestamp(struct timeval* time, const char* time_s);
+void parse_timestamp(struct timespec* time, const char* time_s);
 
 #endif
