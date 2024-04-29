@@ -13,6 +13,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: aclocal
+      run: aclocal --force -I m4 --install
+    - name: autoconf
+      run: autoconf --force
+    - name: libtoolize
+      run: libtoolize --force
+    - name: automake
+      run: automake --add-missing
     - name: configure
       run: ./configure
     - name: make
