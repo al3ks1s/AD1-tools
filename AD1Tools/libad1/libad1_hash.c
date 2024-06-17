@@ -15,7 +15,7 @@ md5_hash(unsigned char* data, unsigned long data_size, unsigned char* output_buf
 
     EVP_DigestUpdate(ctx, data, data_size);
 
-    EVP_DigestFinal(ctx, output_buffer, &data_size);
+    EVP_DigestFinal(ctx, output_buffer, (unsigned int *)&data_size);
 
     EVP_MD_CTX_free(ctx);
 }
@@ -39,7 +39,7 @@ sha1_hash(unsigned char* data, unsigned long data_size, unsigned char* output_bu
 
     EVP_DigestUpdate(ctx, data, data_size);
 
-    EVP_DigestFinal(ctx, output_buffer, &data_size);
+    EVP_DigestFinal(ctx, output_buffer, (unsigned int *)&data_size);
 
     EVP_MD_CTX_free(ctx);
 }
