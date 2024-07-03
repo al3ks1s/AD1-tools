@@ -51,6 +51,7 @@ print_info(ad1_session* session) {
     printf("AD1 logical image info");
     print_logical_header(session->logical_header);
     printf("\n");
+
     if (arguments.tree) {
         print_tree(session->logical_header->first_item, 0);
     }

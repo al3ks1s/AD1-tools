@@ -8,7 +8,7 @@ print_segment_header(ad1_segment_header* segment_header) {
     printf("\n");
 
     printf("Signature \t: %s\n", segment_header->signature);
-    printf("Segmment Index \t: %d\n", segment_header->segment_number);
+    printf("Segment Index \t: %d\n", segment_header->segment_index);
     printf("Segment number \t: %d\n", segment_header->segment_number);
     printf("Frag size \t: %d\n", segment_header->fragments_size);
     printf("Header size \t: %d\n", segment_header->header_size);

@@ -51,6 +51,7 @@ typedef struct ad1_segment_header {
     unsigned int segment_number;
     unsigned int fragments_size;
     unsigned int header_size;
+
 } ad1_segment_header;
 
 typedef struct ad1_logical_header {
@@ -80,6 +81,32 @@ typedef struct ad1_logical_header {
 
 } ad1_logical_header;
 
+typedef struct ad1_encrypt_header {
+    char signature[8];
+
+    unsigned int version;
+    unsigned int total_size;
+
+    short pass_count;    // -1 if unknown
+    short raw_key_count; // -1 if unknown
+    short cert_count;    // -1 if unknown
+
+    unsigned short reserved; // Must be 0
+
+    unsigned int key_algorithm;  // 1 = AES-128, 2 = AES-192, 3 = AES-256 (default)
+    unsigned int hash_algorithm; // 1 = SHA-256, 2 = SHA-512
+
+    unsigned int iteration_count; // Default: 4000
+    unsigned int salt_length;
+    unsigned int ekey_length; // Encrypted key
+    unsigned int hmac_length;
+
+    char* salt;
+    char* encrypted_key;
+    char* hmac;
+
+} ad1_encrypt_header;
+
 enum category { HASH_INFO = 0x01, ITEM_TYPE = 0x02, ITEM_SIZE = 0x03, WINDOWS_FLAGS = 0x04, TIMESTAMP = 0x05 };
 
 enum ad_hash_key { MD5_HASH = 0x5001, SHA1_HASH = 0x5002, DATA_SOURCE_NAME = 0x10002 };
@@ -108,5 +135,9 @@ enum ad_windows_flag_key {
 };
 
 enum ad_timestamp_key { ACCESS = 0x07, MODIFIED = 0x08, CHANGE = 0x09 };
+
+enum ad_encrypt_algo { AES128 = 1, AES192 = 2, AES256 = 3 };
+
+enum ad_hash_algo { SHA256 = 1, SHA512 = 2 };
 
 #endif

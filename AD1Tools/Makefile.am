@@ -4,12 +4,12 @@ SUBDIRS = \
     libad1
 
 
-
 bin_PROGRAMS = \
     ad1info \
     ad1verify \
     ad1extract \
     ad1mount 
+
 
 ad1info_SOURCES = \
     ad1info.c ad1info.h

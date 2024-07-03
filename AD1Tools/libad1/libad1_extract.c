@@ -100,14 +100,6 @@ extract_file(FILE* ad1_file, ad1_item_header* item, const char* output_dir) {
         free(file_data);
     }
 
-    apply_metadata(complete_path, item->first_metadata);
-
-    free(local_item_path);
-    local_item_path = NULL;
-
-    free(complete_path);
-    complete_path = NULL;
-
     if (item->first_child != NULL) {
         extract_file(ad1_file, item->first_child, output_dir);
     }
@@ -115,6 +107,15 @@ extract_file(FILE* ad1_file, ad1_item_header* item, const char* output_dir) {
     if (item->next_item != NULL) {
         extract_file(ad1_file, item->next_item, output_dir);
     }
+
+    // Applying the metadata before extracting children items would obviously change the timestamps...
+    apply_metadata(complete_path, item->first_metadata);
+
+    free(local_item_path);
+    local_item_path = NULL;
+
+    free(complete_path);
+    complete_path = NULL;
 }
 
 void
