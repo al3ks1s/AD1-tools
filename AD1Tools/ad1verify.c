@@ -67,10 +67,10 @@ main(int argc, char* argv[]) {
     if (arguments.full_check) {
         if (!arguments.sha1) {
             printf("Starting md5 check for all files.\n");
-            recurse_md5(session->ad1_file, session->logical_header->first_item);
+            recurse_md5(session, session->logical_header->first_item);
         } else {
             printf("Starting sha1 check for all files.\n");
-            recurse_sha1(session->ad1_file, session->logical_header->first_item);
+            recurse_sha1(session, session->logical_header->first_item);
         }
     } else {
         printf("Not in yet\n");

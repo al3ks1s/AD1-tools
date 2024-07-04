@@ -1,6 +1,7 @@
 #include "libad1_session.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 ad1_session*
 open_ad1_session(char* filepath) {
@@ -11,25 +12,47 @@ open_ad1_session(char* filepath) {
 
     session = (ad1_session*)calloc(1, sizeof(ad1_session));
 
-    session->ad1_file = fopen(filepath, "rb");
+    FILE* headers_file = fopen(filepath, "rb");
 
-    if (session->ad1_file == NULL) {
+    if (headers_file == NULL) {
         printf("Couldn't open file");
         free(session);
         session = 0;
         exit(EXIT_FAILURE);
     }
 
-    session->segment_header = read_segmented_header(session->ad1_file);
+    session->segment_header = read_segmented_header(headers_file);
 
     if (session->segment_header == 0) {
         close_ad1_session(session);
         exit(EXIT_FAILURE);
     }
 
-    session->logical_header = read_logical_header(session->ad1_file);
+    session->logical_header = read_logical_header(headers_file);
 
-    build_item_tree(session->ad1_file, session->logical_header);
+    fclose(headers_file);
+
+    session->ad1_files = (ad1_file**)calloc(session->segment_header->segment_number, sizeof(ad1_file*));
+    unsigned long total = 0;
+    for (int i = 1; i <= session->segment_header->segment_number; i++) {
+
+        session->ad1_files[i - 1] = (ad1_file*)calloc(1, sizeof(ad1_file));
+
+        session->ad1_files[i - 1]->filepath = (char*)calloc(strlen(filepath), sizeof(char));
+        strcpy(session->ad1_files[i - 1]->filepath, filepath);
+        session->ad1_files[i - 1]->filepath[strlen(filepath) - 1] = 0x30 + i;
+
+        session->ad1_files[i - 1]->adfile = (FILE*)calloc(1, sizeof(FILE));
+        session->ad1_files[i - 1]->adfile = fopen(session->ad1_files[i - 1]->filepath, "rb");
+
+        session->ad1_files[i - 1]->segment_index = i;
+
+        fseek(session->ad1_files[i - 1]->adfile, 0, SEEK_END);
+        session->ad1_files[i - 1]->size = ftell(session->ad1_files[i - 1]->adfile) - 0x200;
+    }
+    build_item_tree(session);
+
+    // ADD FILE OPENING ERROR HANDLING
 
     return session;
 }
@@ -39,7 +62,14 @@ close_ad1_session(ad1_session* session) {
 
     free_all(session->segment_header, session->logical_header);
 
-    fclose(session->ad1_file);
+    for (int i = 0; i < session->segment_header->segment_number; i++) {
+
+        fclose(session->ad1_files[i]->adfile);
+        free(session->ad1_files[i]->filepath);
+        free(session->ad1_files[i]);
+    }
+
+    free(session->ad1_files);
 
     free(session);
 }

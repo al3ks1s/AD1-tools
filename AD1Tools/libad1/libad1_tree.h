@@ -7,15 +7,15 @@
 #include "libad1_hash.h"
 #include "libad1_reader.h"
 
-void build_next_metadata(FILE* ad1_file, ad1_metadata* parent_metadata);
+void build_next_metadata(ad1_session* session, ad1_metadata* parent_metadata);
 
-void build_metadata_list(FILE* ad1_file, ad1_item_header* item);
+void build_metadata_list(ad1_session* session, ad1_item_header* item);
 
-void build_next_item(FILE* ad1_file, ad1_item_header* previous_header);
+void build_next_item(ad1_session* session, ad1_item_header* previous_header);
 
-ad1_item_header* build_next_child(FILE* ad1_file, ad1_item_header* parent_header);
+ad1_item_header* build_next_child(ad1_session* session, ad1_item_header* parent_header);
 
-void build_item_tree(FILE* ad1_file, ad1_logical_header* logical_header);
+void build_item_tree(ad1_session* session);
 
 void free_all(ad1_segment_header* segment_header, ad1_logical_header* logical_header);
 

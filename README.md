@@ -1,6 +1,7 @@
 # AD1-tools
 Toolset to extract and mount an AD1 logical image.
 
+See https://al3ks1s.fr/posts/adventures-part-1/ for explanations about the AD1 Format
 
 ## Acknowledgements 
 

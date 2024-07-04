@@ -20,17 +20,17 @@ void sha1_hash(unsigned char* data, unsigned long data_size, unsigned char* outp
 
 void sha1_to_string(unsigned char* sha1_hash, unsigned char output_buffer[SHA1_STRING_LENGTH]);
 
-int check_md5(FILE* ad1_file, ad1_item_header* item);
+int check_md5(ad1_session* session, ad1_item_header* item);
 
-int check_sha1(FILE* ad1_file, ad1_item_header* item);
+int check_sha1(ad1_session* session, ad1_item_header* item);
 
-int recurse_md5(FILE* ad1_file, ad1_item_header* item);
+int recurse_md5(ad1_session* session, ad1_item_header* item);
 
-int recurse_sha1(FILE* ad1_file, ad1_item_header* item);
+int recurse_sha1(ad1_session* session, ad1_item_header* item);
 
-void check_file_md5(FILE* ad1_file);
+void check_file_md5(ad1_session* session);
 
-void check_file_sha1(FILE* ad1_file);
+void check_file_sha1(ad1_session* session);
 
 enum hash_check { HASH_OK, HASH_NOK, HASH_ERR };
 #endif

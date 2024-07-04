@@ -5,31 +5,21 @@
 #include <string.h>
 
 void
-build_next_metadata(FILE* ad1_file, ad1_metadata* parent_metadata) {
-
-    if (ad1_file == NULL) {
-        printf("Couldn't read file");
-        exit(EXIT_FAILURE);
-    }
+build_next_metadata(ad1_session* session, ad1_metadata* parent_metadata) {
 
     if (parent_metadata->next_metadata_addr == 0) {
         return;
     }
 
     ad1_metadata* new_metadata = NULL;
-    new_metadata = read_metadata(ad1_file, parent_metadata->next_metadata_addr + AD1_LOGICAL_MARGIN);
+    new_metadata = arbitrary_read_metadata(session, parent_metadata->next_metadata_addr);
 
     parent_metadata->next_metadata = new_metadata;
-    build_next_metadata(ad1_file, new_metadata);
+    build_next_metadata(session, new_metadata);
 }
 
 void
-build_metadata_list(FILE* ad1_file, ad1_item_header* item) {
-
-    if (ad1_file == NULL) {
-        printf("Couldn't read file");
-        exit(EXIT_FAILURE);
-    }
+build_metadata_list(ad1_session* session, ad1_item_header* item) {
 
     if (item == NULL) {
         printf("No item");
@@ -37,43 +27,35 @@ build_metadata_list(FILE* ad1_file, ad1_item_header* item) {
     }
 
     if (item->first_metadata_addr != 0) {
-        item->first_metadata = read_metadata(ad1_file, item->first_metadata_addr + AD1_LOGICAL_MARGIN);
-        build_next_metadata(ad1_file, item->first_metadata);
+        item->first_metadata = arbitrary_read_metadata(session, item->first_metadata_addr);
+        build_next_metadata(session, item->first_metadata);
     }
 }
 
 void
-build_next_items(FILE* ad1_file, ad1_item_header* previous_header) {
-    if (ad1_file == NULL) {
-        printf("Couldn't read file");
-        exit(EXIT_FAILURE);
-    }
+build_next_items(ad1_session* session, ad1_item_header* previous_header) {
 
     if (previous_header->first_child_addr != 0) {
-        previous_header->first_child = read_item(ad1_file, previous_header->first_child_addr + AD1_LOGICAL_MARGIN);
+        previous_header->first_child = arbitrary_read_item(session, previous_header->first_child_addr);
         previous_header->first_child->parent = previous_header;
-        build_next_items(ad1_file, previous_header->first_child);
+        build_next_items(session, previous_header->first_child);
     }
 
     if (previous_header->next_item_addr != 0) {
-        previous_header->next_item = read_item(ad1_file, previous_header->next_item_addr + AD1_LOGICAL_MARGIN);
+        previous_header->next_item = arbitrary_read_item(session, previous_header->next_item_addr);
         previous_header->next_item->parent = previous_header->parent;
-        build_next_items(ad1_file, previous_header->next_item);
+        build_next_items(session, previous_header->next_item);
     }
 
-    build_metadata_list(ad1_file, previous_header);
+    build_metadata_list(session, previous_header);
 }
 
 void
-build_item_tree(FILE* ad1_file, ad1_logical_header* logical_header) {
-    if (ad1_file == NULL) {
-        printf("Couldn't read file");
-        exit(EXIT_FAILURE);
-    }
+build_item_tree(ad1_session* session) {
 
-    if (logical_header->first_item_addr != 0) {
-        logical_header->first_item = read_item(ad1_file, logical_header->first_item_addr + AD1_LOGICAL_MARGIN);
-        build_next_items(ad1_file, logical_header->first_item);
+    if (session->logical_header->first_item_addr != 0) {
+        session->logical_header->first_item = arbitrary_read_item(session, session->logical_header->first_item_addr);
+        build_next_items(session, session->logical_header->first_item);
     }
 }
 

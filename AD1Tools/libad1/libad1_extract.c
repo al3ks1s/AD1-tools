@@ -30,11 +30,11 @@ extract_all(ad1_session* session, const char* output_dir) {
         }
     }
 
-    extract_file(session->ad1_file, session->logical_header->first_item, output_dir);
+    extract_file(session, session->logical_header->first_item, output_dir);
 }
 
 void
-extract_file(FILE* ad1_file, ad1_item_header* item, const char* output_dir) {
+extract_file(ad1_session* session, ad1_item_header* item, const char* output_dir) {
 
     // Build entire item path with the output folder prefix
     int output_dir_length;
@@ -88,7 +88,7 @@ extract_file(FILE* ad1_file, ad1_item_header* item, const char* output_dir) {
 
         output_file = fopen(complete_path, "wb");
         if (output_file != NULL) {
-            file_data = read_file_data(ad1_file, item);
+            file_data = read_file_data(session, item);
 
             fwrite(file_data, sizeof(char), item->decompressed_size, output_file);
 
@@ -101,11 +101,11 @@ extract_file(FILE* ad1_file, ad1_item_header* item, const char* output_dir) {
     }
 
     if (item->first_child != NULL) {
-        extract_file(ad1_file, item->first_child, output_dir);
+        extract_file(session, item->first_child, output_dir);
     }
 
     if (item->next_item != NULL) {
-        extract_file(ad1_file, item->next_item, output_dir);
+        extract_file(session, item->next_item, output_dir);
     }
 
     // Applying the metadata before extracting children items would obviously change the timestamps...

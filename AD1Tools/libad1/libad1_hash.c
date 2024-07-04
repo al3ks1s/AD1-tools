@@ -15,7 +15,7 @@ md5_hash(unsigned char* data, unsigned long data_size, unsigned char* output_buf
 
     EVP_DigestUpdate(ctx, data, data_size);
 
-    EVP_DigestFinal(ctx, output_buffer, (unsigned int *)&data_size);
+    EVP_DigestFinal(ctx, output_buffer, (unsigned int*)&data_size);
 
     EVP_MD_CTX_free(ctx);
 }
@@ -39,7 +39,7 @@ sha1_hash(unsigned char* data, unsigned long data_size, unsigned char* output_bu
 
     EVP_DigestUpdate(ctx, data, data_size);
 
-    EVP_DigestFinal(ctx, output_buffer, (unsigned int *)&data_size);
+    EVP_DigestFinal(ctx, output_buffer, (unsigned int*)&data_size);
 
     EVP_MD_CTX_free(ctx);
 }
@@ -53,7 +53,7 @@ sha1_to_string(unsigned char* sha1_hash, unsigned char output_buffer[SHA1_STRING
 }
 
 int
-check_md5(FILE* ad1_file, ad1_item_header* item) {
+check_md5(ad1_session* session, ad1_item_header* item) {
 
     ad1_metadata* metadata;
 
@@ -66,13 +66,13 @@ check_md5(FILE* ad1_file, ad1_item_header* item) {
         metadata = metadata->next_metadata;
     }
 
-    if (metadata->next_metadata == NULL) {
+    if (metadata == NULL) {
         return HASH_ERR;
     }
 
     item_metadata_hash = metadata->data;
 
-    file_data = read_file_data(ad1_file, item);
+    file_data = read_file_data(session, item);
 
     md5_hash(file_data, item->decompressed_size, calculated_hash);
 
@@ -86,7 +86,7 @@ check_md5(FILE* ad1_file, ad1_item_header* item) {
 }
 
 int
-check_sha1(FILE* ad1_file, ad1_item_header* item) {
+check_sha1(ad1_session* session, ad1_item_header* item) {
     ad1_metadata* metadata;
 
     unsigned char *item_metadata_hash, calculated_hash[SHA1_DIGEST_LENGTH], calculated_hash_string[SHA1_STRING_LENGTH];
@@ -98,13 +98,13 @@ check_sha1(FILE* ad1_file, ad1_item_header* item) {
         metadata = metadata->next_metadata;
     }
 
-    if (metadata->next_metadata == NULL) {
+    if (metadata == NULL) {
         return HASH_ERR;
     }
 
     item_metadata_hash = metadata->data;
 
-    file_data = read_file_data(ad1_file, item);
+    file_data = read_file_data(session, item);
 
     sha1_hash(file_data, item->decompressed_size, calculated_hash);
 
@@ -118,58 +118,58 @@ check_sha1(FILE* ad1_file, ad1_item_header* item) {
 }
 
 int
-recurse_md5(FILE* ad1_file, ad1_item_header* item) {
+recurse_md5(ad1_session* session, ad1_item_header* item) {
 
     int ret;
 
     if (item->item_type != AD1_FOLDER_SIGNATURE) {
-        ret = check_md5(ad1_file, item);
+        ret = check_md5(session, item);
 
         switch (ret) {
             case HASH_OK: printf("File : %s OK\n", build_item_path(item)); break;
-            case HASH_ERR: printf("File : %s ERROR\n", build_item_path(item)); return ret;
-            case HASH_NOK: printf("File : %s Hash differs\n", build_item_path(item)); return ret;
+            case HASH_ERR: printf("File : %s ERROR\n", build_item_path(item)); break;
+            case HASH_NOK: printf("File : %s Hash differs\n", build_item_path(item)); break;
         }
     }
 
     if (item->first_child != 0) {
-        recurse_md5(ad1_file, item->first_child);
+        recurse_md5(session, item->first_child);
     }
 
     if (item->next_item != 0) {
-        recurse_md5(ad1_file, item->next_item);
+        recurse_md5(session, item->next_item);
     }
 
     return ret;
 }
 
 int
-recurse_sha1(FILE* ad1_file, ad1_item_header* item) {
+recurse_sha1(ad1_session* session, ad1_item_header* item) {
     int ret;
 
     if (item->item_type != AD1_FOLDER_SIGNATURE) {
-        ret = check_sha1(ad1_file, item);
+        ret = check_sha1(session, item);
 
         switch (ret) {
-            case HASH_OK: printf("%s OK\n", build_item_path(item)); break;
-            case HASH_ERR: printf("%s ERROR\n", build_item_path(item)); return ret;
-            case HASH_NOK: printf("%s Hash differs\n", build_item_path(item)); return ret;
+            case HASH_OK: printf("File : %s OK\n", build_item_path(item)); break;
+            case HASH_ERR: printf("File : %s ERROR\n", build_item_path(item)); break;
+            case HASH_NOK: printf("File : %s Hash differs\n", build_item_path(item)); break;
         }
     }
 
     if (item->first_child != 0) {
-        recurse_sha1(ad1_file, item->first_child);
+        recurse_sha1(session, item->first_child);
     }
 
     if (item->next_item != 0) {
-        recurse_sha1(ad1_file, item->next_item);
+        recurse_sha1(session, item->next_item);
     }
 
     return ret;
 }
 
 void
-check_file_md5(FILE* ad1_file) {}
+check_file_md5(ad1_session* session) {}
 
 void
-check_file_sha1(FILE* ad1_file) {}
+check_file_sha1(ad1_session* session) {}

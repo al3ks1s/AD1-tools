@@ -6,7 +6,7 @@
 #include <zlib.h>
 
 unsigned char*
-read_file_data(FILE* ad1_file, ad1_item_header* ad1_item) {
+read_file_data(ad1_session* session, ad1_item_header* ad1_item) {
 
     unsigned long chunk_numbers;
     unsigned char* file_data = NULL;
@@ -19,7 +19,7 @@ read_file_data(FILE* ad1_file, ad1_item_header* ad1_item) {
 
     file_data = (unsigned char*)calloc(ad1_item->decompressed_size, sizeof(unsigned char));
 
-    chunk_numbers = read_long_little_endian(ad1_file, ad1_item->zlib_metadata_addr + AD1_LOGICAL_MARGIN);
+    chunk_numbers = arbitrary_read_long_little_endian(session, ad1_item->zlib_metadata_addr);
 
     /* 
      * The last address in the zlib metadata points at the end of the last chunk, 
@@ -28,12 +28,11 @@ read_file_data(FILE* ad1_file, ad1_item_header* ad1_item) {
     unsigned long addresses[chunk_numbers + 1];
 
     for (int i = 0; i < chunk_numbers + 1; i++) {
-        addresses[i] = read_long_little_endian(ad1_file,
-                                               ad1_item->zlib_metadata_addr + AD1_LOGICAL_MARGIN + ((i + 1) * 0x08));
+        addresses[i] = arbitrary_read_long_little_endian(session, ad1_item->zlib_metadata_addr + ((i + 1) * 0x08));
     }
 
     for (int i = 0; i < chunk_numbers; i++) {
-        data_index += read_zlib_chunk(ad1_file, file_data + data_index, addresses[i], addresses[i + 1] - addresses[i],
+        data_index += read_zlib_chunk(session, file_data + data_index, addresses[i], addresses[i + 1] - addresses[i],
                                       ad1_item->decompressed_size);
     }
 
@@ -41,16 +40,15 @@ read_file_data(FILE* ad1_file, ad1_item_header* ad1_item) {
 }
 
 long
-read_zlib_chunk(FILE* ad1_file, unsigned char* output_data_ptr, unsigned long offset, unsigned int zlib_chunk_size,
-                unsigned long decompressed_size) {
+read_zlib_chunk(ad1_session* session, unsigned char* output_data_ptr, unsigned long offset,
+                unsigned int zlib_chunk_size, unsigned long decompressed_size) {
 
     unsigned char* compressed_data;
     unsigned long chunk_decompressed_size = 0;
 
     compressed_data = (unsigned char*)calloc(zlib_chunk_size, sizeof(char));
 
-    fseek(ad1_file, offset + AD1_LOGICAL_MARGIN, SEEK_SET);
-    fread(compressed_data, 1, zlib_chunk_size, ad1_file);
+    arbitrary_read(session, compressed_data, zlib_chunk_size, offset);
 
     chunk_decompressed_size = zlib_inflate(compressed_data, zlib_chunk_size, output_data_ptr, decompressed_size);
 

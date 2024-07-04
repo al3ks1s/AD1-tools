@@ -5,6 +5,132 @@
 #include <string.h>
 
 void
+arbitrary_read(ad1_session* session, char* buf, unsigned long length, unsigned long offset) {
+    unsigned long toRead = length;
+    unsigned int char_cursor = 0;
+
+    unsigned int file_cursor =
+        (unsigned int)(offset / ((session->segment_header->fragments_size * 65536) - AD1_LOGICAL_MARGIN));
+
+    unsigned long data_cursor =
+        offset - (((session->segment_header->fragments_size * 65536) - AD1_LOGICAL_MARGIN) * file_cursor);
+
+    while (toRead > 0) {
+
+        unsigned long trunc_size_read = toRead;
+
+        if (toRead + data_cursor > session->ad1_files[file_cursor]->size) {
+            trunc_size_read = session->ad1_files[file_cursor]->size - data_cursor;
+        }
+
+        fseek(session->ad1_files[file_cursor]->adfile, data_cursor + AD1_LOGICAL_MARGIN, SEEK_SET);
+        fread(&buf[char_cursor], 1, trunc_size_read, session->ad1_files[file_cursor]->adfile);
+
+        //printf("Reading %d bytes of data in file %d, from %x address. %d bytes remaining\n", trunc_size_read,
+        //       file_cursor, data_cursor, toRead);
+
+        char_cursor += trunc_size_read;
+        toRead -= trunc_size_read;
+        data_cursor = 0;
+        file_cursor += 1;
+    }
+}
+
+void
+arbitrary_read_ad1_string(ad1_session* session, char* buf, int length, unsigned long offset) {
+    arbitrary_read(session, buf, length, offset);
+}
+
+short
+arbitrary_read_short_little_endian(ad1_session* session, unsigned long offset) {
+
+    short* le_short = 0;
+    char short_buf[2] = {0};
+
+    arbitrary_read(session, short_buf, 2, offset);
+
+    le_short = (short*)short_buf;
+
+    return (short)le32toh(*le_short);
+}
+
+int
+arbitrary_read_int_little_endian(ad1_session* session, unsigned long offset) {
+    int* le_int = 0;
+    char int_buf[4] = {0};
+
+    arbitrary_read(session, int_buf, 4, offset);
+
+    le_int = (int*)int_buf;
+
+    return (int)le32toh(*le_int);
+}
+
+long
+arbitrary_read_long_little_endian(ad1_session* session, unsigned long offset) {
+    long* le_long = 0;
+    char long_buf[8] = {0};
+
+    arbitrary_read(session, long_buf, 8, offset);
+
+    le_long = (long*)long_buf;
+
+    return (long)le32toh(*le_long);
+}
+
+ad1_item_header*
+arbitrary_read_item(ad1_session* session, unsigned long offset) {
+
+    ad1_item_header* item_header = NULL;
+
+    item_header = (ad1_item_header*)calloc(1, sizeof(ad1_item_header));
+
+    item_header->next_item_addr = arbitrary_read_long_little_endian(session, offset);
+    item_header->first_child_addr = arbitrary_read_long_little_endian(session, offset + 0x08);
+    item_header->first_metadata_addr = arbitrary_read_long_little_endian(session, offset + 0x10);
+    item_header->zlib_metadata_addr = arbitrary_read_long_little_endian(session, offset + 0x18);
+    item_header->decompressed_size = arbitrary_read_long_little_endian(session, offset + 0x20);
+    item_header->item_type = arbitrary_read_int_little_endian(session, offset + 0x28);
+    item_header->item_name_length = arbitrary_read_int_little_endian(session, offset + 0x2c);
+
+    item_header->item_name = (char*)calloc(item_header->item_name_length + 1, sizeof(char));
+    arbitrary_read_ad1_string(session, item_header->item_name, item_header->item_name_length, offset + 0x30);
+
+    // Transforming slashes into underscores so that it doesn't mess up file paths on extraction or mounting
+    for (int i = 0; i < item_header->item_name_length; i++) {
+        if (item_header->item_name[i] == 47) {
+            item_header->item_name[i] = 95;
+        }
+    }
+
+    item_header->parent_folder = arbitrary_read_long_little_endian(session,
+                                                                   offset + 0x30 + item_header->item_name_length);
+
+    return item_header;
+}
+
+ad1_metadata*
+arbitrary_read_metadata(ad1_session* session, unsigned long offset) {
+
+    ad1_metadata* metadata = NULL;
+    metadata = (ad1_metadata*)calloc(1, sizeof(ad1_metadata));
+
+    metadata->next_metadata_addr = arbitrary_read_long_little_endian(session, offset);
+    metadata->category = arbitrary_read_int_little_endian(session, offset + 0x08);
+    metadata->key = arbitrary_read_int_little_endian(session, offset + 0x0c);
+    metadata->data_length = arbitrary_read_int_little_endian(session, offset + 0x10);
+
+    metadata->data = (char*)calloc(metadata->data_length + 1, sizeof(char));
+    arbitrary_read_ad1_string(session, metadata->data, metadata->data_length, offset + 0x14);
+
+    return metadata;
+}
+
+/*
+ * Legacy readers, useful for initial headers reading before the session is setup.
+ */
+
+void
 read_ad1_string(FILE* ad1_file, char* buf, int length, unsigned long offset) {
     if (ad1_file == NULL) {
         printf("Cannot read from file");
@@ -15,10 +141,10 @@ read_ad1_string(FILE* ad1_file, char* buf, int length, unsigned long offset) {
     fgets(buf, length + 1, ad1_file);
 }
 
-unsigned int
+int
 read_int_little_endian(FILE* ad1_file, unsigned long offset) {
 
-    unsigned int le_value = 0;
+    int le_value = 0;
 
     if (ad1_file == NULL) {
         printf("Cannot read from file");
@@ -31,10 +157,10 @@ read_int_little_endian(FILE* ad1_file, unsigned long offset) {
     return (int)le32toh(le_value);
 }
 
-unsigned int
+long
 read_long_little_endian(FILE* ad1_file, unsigned long offset) {
 
-    unsigned long le_value = 0;
+    long le_value = 0;
 
     if (ad1_file == NULL) {
         printf("Cannot read from file");

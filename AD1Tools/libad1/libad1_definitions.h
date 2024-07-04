@@ -2,6 +2,7 @@
 #define LIBAD1_DEF_H
 
 #include <stdint.h>
+#include <stdio.h>
 
 #define AD1_LOGICAL_MARGIN   512
 
@@ -106,6 +107,24 @@ typedef struct ad1_encrypt_header {
     char* hmac;
 
 } ad1_encrypt_header;
+
+typedef struct ad1_file {
+
+    unsigned long size;
+    unsigned int segment_index;
+
+    char* filepath;
+    FILE* adfile;
+
+} ad1_file;
+
+typedef struct ad1_session {
+    ad1_segment_header* segment_header;
+    ad1_logical_header* logical_header;
+
+    ad1_file** ad1_files;
+
+} ad1_session;
 
 enum category { HASH_INFO = 0x01, ITEM_TYPE = 0x02, ITEM_SIZE = 0x03, WINDOWS_FLAGS = 0x04, TIMESTAMP = 0x05 };
 
