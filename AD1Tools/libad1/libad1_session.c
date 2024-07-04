@@ -64,8 +64,6 @@ open_ad1_session(char* filepath) {
     }
     build_item_tree(session);
 
-    // ADD FILE OPENING ERROR HANDLING
-
     return session;
 }
 
