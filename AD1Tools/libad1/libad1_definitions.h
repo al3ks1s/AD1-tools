@@ -35,7 +35,7 @@ typedef struct ad1_item_header {
 
     unsigned long parent_folder;
 
-    char* item_name;
+    unsigned char* item_name;
 
     struct ad1_item_header* next_item;
     struct ad1_item_header* first_child;
@@ -113,7 +113,7 @@ typedef struct ad1_file {
     unsigned long size;
     unsigned int segment_index;
 
-    unsigned char* filepath;
+    char* filepath;
     FILE* adfile;
 
 } ad1_file;

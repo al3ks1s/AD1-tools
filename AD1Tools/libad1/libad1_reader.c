@@ -37,7 +37,7 @@ arbitrary_read(ad1_session* session, unsigned char* buf, unsigned long length, u
 }
 
 void
-arbitrary_read_ad1_string(ad1_session* session, char* buf, int length, unsigned long offset) {
+arbitrary_read_ad1_string(ad1_session* session, unsigned char* buf, int length, unsigned long offset) {
     arbitrary_read(session, buf, length, offset);
 }
 
@@ -45,7 +45,7 @@ short
 arbitrary_read_short_little_endian(ad1_session* session, unsigned long offset) {
 
     short* le_short = 0;
-    char short_buf[2] = {0};
+    unsigned char short_buf[2] = {0};
 
     arbitrary_read(session, short_buf, 2, offset);
 
@@ -57,7 +57,7 @@ arbitrary_read_short_little_endian(ad1_session* session, unsigned long offset) {
 int
 arbitrary_read_int_little_endian(ad1_session* session, unsigned long offset) {
     int* le_int = 0;
-    char int_buf[4] = {0};
+    unsigned char int_buf[4] = {0};
 
     arbitrary_read(session, int_buf, 4, offset);
 
@@ -69,7 +69,7 @@ arbitrary_read_int_little_endian(ad1_session* session, unsigned long offset) {
 long
 arbitrary_read_long_little_endian(ad1_session* session, unsigned long offset) {
     long* le_long = 0;
-    char long_buf[8] = {0};
+    unsigned char long_buf[8] = {0};
 
     arbitrary_read(session, long_buf, 8, offset);
 
@@ -93,7 +93,7 @@ arbitrary_read_item(ad1_session* session, unsigned long offset) {
     item_header->item_type = arbitrary_read_int_little_endian(session, offset + 0x28);
     item_header->item_name_length = arbitrary_read_int_little_endian(session, offset + 0x2c);
 
-    item_header->item_name = (char*)calloc(item_header->item_name_length + 1, sizeof(char));
+    item_header->item_name = (unsigned char*)calloc(item_header->item_name_length + 1, sizeof(char));
     arbitrary_read_ad1_string(session, item_header->item_name, item_header->item_name_length, offset + 0x30);
 
     // Transforming slashes into underscores so that it doesn't mess up file paths on extraction or mounting
@@ -120,7 +120,7 @@ arbitrary_read_metadata(ad1_session* session, unsigned long offset) {
     metadata->key = arbitrary_read_int_little_endian(session, offset + 0x0c);
     metadata->data_length = arbitrary_read_int_little_endian(session, offset + 0x10);
 
-    metadata->data = (char*)calloc(metadata->data_length + 1, sizeof(char));
+    metadata->data = (unsigned char*)calloc(metadata->data_length + 1, sizeof(char));
     arbitrary_read_ad1_string(session, metadata->data, metadata->data_length, offset + 0x14);
 
     return metadata;
@@ -131,7 +131,7 @@ arbitrary_read_metadata(ad1_session* session, unsigned long offset) {
  */
 
 void
-read_ad1_string(FILE* ad1_file, char* buf, int length, unsigned long offset) {
+read_ad1_string(FILE* ad1_file, unsigned char* buf, int length, unsigned long offset) {
     if (ad1_file == NULL) {
         printf("Cannot read from file");
         exit(EXIT_FAILURE);
@@ -233,7 +233,8 @@ read_logical_header(FILE* ad1_file) {
     logical_header->attrguid_footer_addr = read_long_little_endian(ad1_file, 0x23c);
     logical_header->locsguid_footer_addr = read_long_little_endian(ad1_file, 0x24c);
 
-    logical_header->data_source_name = (char*)calloc(logical_header->data_source_name_length + 1, sizeof(char));
+    logical_header->data_source_name = (unsigned char*)calloc(logical_header->data_source_name_length + 1,
+                                                              sizeof(char));
     read_ad1_string(ad1_file, logical_header->data_source_name, logical_header->data_source_name_length, 0x25c);
 
     return logical_header;
@@ -258,7 +259,7 @@ read_item(FILE* ad1_file, unsigned long offset) {
     item_header->item_type = read_int_little_endian(ad1_file, offset + 0x28);
     item_header->item_name_length = read_int_little_endian(ad1_file, offset + 0x2c);
 
-    item_header->item_name = (char*)calloc(item_header->item_name_length + 1, sizeof(char));
+    item_header->item_name = (unsigned char*)calloc(item_header->item_name_length + 1, sizeof(char));
     read_ad1_string(ad1_file, item_header->item_name, item_header->item_name_length, offset + 0x30);
 
     // Transforming slashes into underscores so that it doesn't mess up file paths on extraction or mounting
@@ -288,7 +289,7 @@ read_metadata(FILE* ad1_file, unsigned long offset) {
     metadata->key = read_int_little_endian(ad1_file, offset + 0x0c);
     metadata->data_length = read_int_little_endian(ad1_file, offset + 0x10);
 
-    metadata->data = (char*)calloc(metadata->data_length + 1, sizeof(char));
+    metadata->data = (unsigned char*)calloc(metadata->data_length + 1, sizeof(char));
     read_ad1_string(ad1_file, metadata->data, metadata->data_length, offset + 0x14);
 
     return metadata;
