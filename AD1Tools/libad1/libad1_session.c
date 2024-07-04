@@ -1,4 +1,5 @@
 #include "libad1_session.h"
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,12 +39,22 @@ open_ad1_session(char* filepath) {
 
         session->ad1_files[i - 1] = (ad1_file*)calloc(1, sizeof(ad1_file));
 
-        session->ad1_files[i - 1]->filepath = (char*)calloc(strlen(filepath), sizeof(char));
+        // Create filepaths for adX up to roughly INT_MAX
+        char extension[11] = {0};
+        sprintf(extension, "%d", i);
+        int extension_length = strlen(extension);
+
+        session->ad1_files[i - 1]->filepath = (char*)calloc(strlen(filepath) + extension_length - 1, sizeof(char));
         strcpy(session->ad1_files[i - 1]->filepath, filepath);
-        session->ad1_files[i - 1]->filepath[strlen(filepath) - 1] = 0x30 + i;
+        memcpy(session->ad1_files[i - 1]->filepath + strlen(filepath) - 1, extension, extension_length);
 
         session->ad1_files[i - 1]->adfile = (FILE*)calloc(1, sizeof(FILE));
         session->ad1_files[i - 1]->adfile = fopen(session->ad1_files[i - 1]->filepath, "rb");
+
+        if (session->ad1_files[i - 1] == NULL) {
+            printf("Couldn't find or open file : %s", session->ad1_files[i - 1]->filepath);
+            exit(EXIT_FAILURE);
+        }
 
         session->ad1_files[i - 1]->segment_index = i;
 

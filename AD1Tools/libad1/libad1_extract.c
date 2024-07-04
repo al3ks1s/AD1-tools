@@ -14,6 +14,8 @@
 void
 extract_all(ad1_session* session, const char* output_dir) {
 
+    printf("Extracting files");
+
     if (mkdir(output_dir, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP) == -1) {
         switch (errno) {
             case EACCES: printf("You don't have access to %s.", output_dir); return;
@@ -50,9 +52,8 @@ extract_file(ad1_session* session, ad1_item_header* item, const char* output_dir
     complete_path[output_dir_length] = 47;
     memcpy(complete_path + output_dir_length + 1, local_item_path, get_path_length(item));
 
-    /*
-    fprintf(stdout, "\rExtracting : %s", complete_path);
-    fflush(stdout);
+    //printf("\rExtracting : %s", item->item_name);
+    //fflush(stdout);
     //*/
 
     // There's probably a lot to improve on that one, like the program not extracting files next to a folder it doesn't manage to create, not gonna do that today tho
