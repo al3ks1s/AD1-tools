@@ -5,7 +5,7 @@
 #include <string.h>
 
 void
-arbitrary_read(ad1_session* session, char* buf, unsigned long length, unsigned long offset) {
+arbitrary_read(ad1_session* session, unsigned char* buf, unsigned long length, unsigned long offset) {
     unsigned long toRead = length;
     unsigned int char_cursor = 0;
 

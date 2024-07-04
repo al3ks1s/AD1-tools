@@ -14,7 +14,7 @@ typedef struct ad1_metadata {
     unsigned int key;
     unsigned int data_length;
 
-    char* data;
+    unsigned char* data;
 
     struct ad1_metadata* next_metadata;
 
@@ -47,7 +47,7 @@ typedef struct ad1_item_header {
 
 typedef struct ad1_segment_header {
 
-    char signature[16];
+    unsigned char signature[16];
     unsigned int segment_index;
     unsigned int segment_number;
     unsigned int fragments_size;
@@ -57,7 +57,7 @@ typedef struct ad1_segment_header {
 
 typedef struct ad1_logical_header {
 
-    char signature[16];
+    unsigned char signature[16];
     unsigned int image_version;
 
     unsigned int some_data;
@@ -69,13 +69,13 @@ typedef struct ad1_logical_header {
 
     unsigned int data_source_name_length;
 
-    char ad_signature[4];
+    unsigned char ad_signature[4];
     unsigned long data_source_name_addr;
 
     unsigned long attrguid_footer_addr;
     unsigned long locsguid_footer_addr;
 
-    char* data_source_name;
+    unsigned char* data_source_name;
 
     struct ad1_item_header* first_item;
     struct ad1_metadata* logical_metadata;
@@ -83,7 +83,7 @@ typedef struct ad1_logical_header {
 } ad1_logical_header;
 
 typedef struct ad1_encrypt_header {
-    char signature[8];
+    unsigned char signature[8];
 
     unsigned int version;
     unsigned int total_size;
@@ -102,9 +102,9 @@ typedef struct ad1_encrypt_header {
     unsigned int ekey_length; // Encrypted key
     unsigned int hmac_length;
 
-    char* salt;
-    char* encrypted_key;
-    char* hmac;
+    unsigned char* salt;
+    unsigned char* encrypted_key;
+    unsigned char* hmac;
 
 } ad1_encrypt_header;
 
@@ -113,7 +113,7 @@ typedef struct ad1_file {
     unsigned long size;
     unsigned int segment_index;
 
-    char* filepath;
+    unsigned char* filepath;
     FILE* adfile;
 
 } ad1_file;
