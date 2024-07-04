@@ -53,6 +53,7 @@ open_ad1_session(char* filepath) {
 
         if (session->ad1_files[i - 1] == NULL) {
             printf("Couldn't find or open file : %s", session->ad1_files[i - 1]->filepath);
+            close_ad1_session(session);
             exit(EXIT_FAILURE);
         }
 
