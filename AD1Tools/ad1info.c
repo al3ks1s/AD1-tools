@@ -16,7 +16,7 @@ static struct argp_option options[] = {{"verbose", 'v', 0, OPTION_ARG_OPTIONAL, 
                                        {0}};
 
 struct arguments {
-    enum { NORMAL, VERBOSE, QUIET } mode;
+    enum { ARGNORMAL, ARGVERBOSE, ARGQUIET } mode;
 
     char* ad1_file_path;
     bool tree;
@@ -74,6 +74,8 @@ main(int argc, char* argv[]) {
     ad1_session* session;
 
     session = open_ad1_session(arguments.ad1_file_path);
+
+    session->mode = arguments.mode;
 
     print_info(session);
 

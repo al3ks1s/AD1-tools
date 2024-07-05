@@ -53,6 +53,10 @@ build_next_items(ad1_session* session, ad1_item_header* previous_header) {
 void
 build_item_tree(ad1_session* session) {
 
+    if (session->mode == VERBOSE) {
+        printf("%s\n", "Building the tree out of the ad1 file");
+    }
+
     if (session->logical_header->first_item_addr != 0) {
         session->logical_header->first_item = arbitrary_read_item(session, session->logical_header->first_item_addr);
         build_next_items(session, session->logical_header->first_item);

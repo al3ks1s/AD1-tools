@@ -22,7 +22,7 @@ static struct argp_option options[] = {
     {0}};
 
 struct arguments {
-    enum { NORMAL, VERBOSE, QUIET } mode;
+    enum { ARGNORMAL, ARGVERBOSE, ARGQUIET } mode;
 
     bool integrity_check;
     bool metadata;
@@ -75,6 +75,8 @@ main(int argc, char* argv[]) {
     ad1_session* session;
 
     session = open_ad1_session(arguments.ad1_file_path);
+
+    session->mode = arguments.mode;
 
     extract_all(session, arguments.output_dir);
 

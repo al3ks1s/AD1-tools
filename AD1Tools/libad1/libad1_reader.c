@@ -51,7 +51,7 @@ arbitrary_read_short_little_endian(ad1_session* session, unsigned long offset) {
 
     le_short = (short*)short_buf;
 
-    return (short)le32toh(*le_short);
+    return (short)le16toh(*le_short);
 }
 
 int
@@ -75,7 +75,7 @@ arbitrary_read_long_little_endian(ad1_session* session, unsigned long offset) {
 
     le_long = (long*)long_buf;
 
-    return (long)le32toh(*le_long);
+    return (long)le64toh(*le_long);
 }
 
 ad1_item_header*
@@ -131,7 +131,7 @@ arbitrary_read_metadata(ad1_session* session, unsigned long offset) {
  */
 
 void
-read_ad1_string(FILE* ad1_file, unsigned char* buf, int length, unsigned long offset) {
+read_string(FILE* ad1_file, unsigned char* buf, int length, unsigned long offset) {
     if (ad1_file == NULL) {
         printf("Cannot read from file");
         exit(EXIT_FAILURE);
@@ -139,6 +139,22 @@ read_ad1_string(FILE* ad1_file, unsigned char* buf, int length, unsigned long of
 
     fseek(ad1_file, offset, SEEK_SET);
     fgets(buf, length + 1, ad1_file);
+}
+
+short
+read_short_little_endian(FILE* ad1_file, unsigned long offset) {
+
+    short le_value = 0;
+
+    if (ad1_file == NULL) {
+        printf("Cannot read from file");
+        exit(EXIT_FAILURE);
+    }
+
+    fseek(ad1_file, offset, SEEK_SET);
+    fread(&le_value, 2, 1, ad1_file);
+
+    return (int)le16toh(le_value);
 }
 
 int
@@ -219,7 +235,7 @@ read_logical_header(FILE* ad1_file) {
 
     logical_header = (ad1_logical_header*)calloc(1, sizeof(ad1_logical_header));
 
-    read_ad1_string(ad1_file, logical_header->signature, 15, AD1_LOGICAL_MARGIN);
+    read_string(ad1_file, logical_header->signature, 15, AD1_LOGICAL_MARGIN);
 
     logical_header->image_version = read_int_little_endian(ad1_file, 0x210);
     logical_header->zlib_chunk_size = read_int_little_endian(ad1_file, 0x218);
@@ -227,7 +243,7 @@ read_logical_header(FILE* ad1_file) {
     logical_header->first_item_addr = read_long_little_endian(ad1_file, 0x224);
     logical_header->data_source_name_length = read_int_little_endian(ad1_file, 0x22c);
 
-    read_ad1_string(ad1_file, logical_header->ad_signature, 3, 0x230);
+    read_string(ad1_file, logical_header->ad_signature, 3, 0x230);
 
     logical_header->data_source_name_addr = read_long_little_endian(ad1_file, 0x234);
     logical_header->attrguid_footer_addr = read_long_little_endian(ad1_file, 0x23c);
@@ -235,7 +251,7 @@ read_logical_header(FILE* ad1_file) {
 
     logical_header->data_source_name = (unsigned char*)calloc(logical_header->data_source_name_length + 1,
                                                               sizeof(char));
-    read_ad1_string(ad1_file, logical_header->data_source_name, logical_header->data_source_name_length, 0x25c);
+    read_string(ad1_file, logical_header->data_source_name, logical_header->data_source_name_length, 0x25c);
 
     return logical_header;
 }
@@ -260,7 +276,7 @@ read_item(FILE* ad1_file, unsigned long offset) {
     item_header->item_name_length = read_int_little_endian(ad1_file, offset + 0x2c);
 
     item_header->item_name = (unsigned char*)calloc(item_header->item_name_length + 1, sizeof(char));
-    read_ad1_string(ad1_file, item_header->item_name, item_header->item_name_length, offset + 0x30);
+    read_string(ad1_file, item_header->item_name, item_header->item_name_length, offset + 0x30);
 
     // Transforming slashes into underscores so that it doesn't mess up file paths on extraction or mounting
     for (int i = 0; i < item_header->item_name_length; i++) {
@@ -290,7 +306,7 @@ read_metadata(FILE* ad1_file, unsigned long offset) {
     metadata->data_length = read_int_little_endian(ad1_file, offset + 0x10);
 
     metadata->data = (unsigned char*)calloc(metadata->data_length + 1, sizeof(char));
-    read_ad1_string(ad1_file, metadata->data, metadata->data_length, offset + 0x14);
+    read_string(ad1_file, metadata->data, metadata->data_length, offset + 0x14);
 
     return metadata;
 }

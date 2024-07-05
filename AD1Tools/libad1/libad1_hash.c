@@ -78,7 +78,7 @@ check_md5(ad1_session* session, ad1_item_header* item) {
 
     md5_to_string(calculated_hash, calculated_hash_string);
 
-    if (strncmp(item_metadata_hash, calculated_hash_string, MD5_STRING_LENGTH - 1) == 0) {
+    if (strncmp((char*)item_metadata_hash, (char*)calculated_hash_string, MD5_STRING_LENGTH - 1) == 0) {
         return HASH_OK;
     } else {
         return HASH_NOK;
@@ -110,7 +110,7 @@ check_sha1(ad1_session* session, ad1_item_header* item) {
 
     sha1_to_string(calculated_hash, calculated_hash_string);
 
-    if (strncmp(item_metadata_hash, calculated_hash_string, SHA1_STRING_LENGTH - 1) == 0) {
+    if (strncmp((char*)item_metadata_hash, (char*)calculated_hash_string, SHA1_STRING_LENGTH - 1) == 0) {
         return HASH_OK;
     } else {
         return HASH_NOK;
@@ -126,9 +126,9 @@ recurse_md5(ad1_session* session, ad1_item_header* item) {
         ret = check_md5(session, item);
 
         switch (ret) {
-            case HASH_OK: printf("File : %s OK\n", build_item_path(item)); break;
-            case HASH_ERR: printf("File : %s ERROR\n", build_item_path(item)); break;
-            case HASH_NOK: printf("File : %s Hash differs\n", build_item_path(item)); break;
+            case HASH_OK: printf("MD5 OK for file : %s\n", build_item_path(item)); break;
+            case HASH_ERR: printf("MD5 ERROR for file : %s\n", build_item_path(item)); break;
+            case HASH_NOK: printf("MD5 NOK for file : %s\n", build_item_path(item)); break;
         }
     }
 
@@ -151,9 +151,9 @@ recurse_sha1(ad1_session* session, ad1_item_header* item) {
         ret = check_sha1(session, item);
 
         switch (ret) {
-            case HASH_OK: printf("File : %s OK\n", build_item_path(item)); break;
-            case HASH_ERR: printf("File : %s ERROR\n", build_item_path(item)); break;
-            case HASH_NOK: printf("File : %s Hash differs\n", build_item_path(item)); break;
+            case HASH_OK: printf("SHA1 OK for file : %s\n", build_item_path(item)); break;
+            case HASH_ERR: printf("SHA1 ERROR for file : %s\n", build_item_path(item)); break;
+            case HASH_NOK: printf("SHA1 NOK for file : %s\n", build_item_path(item)); break;
         }
     }
 

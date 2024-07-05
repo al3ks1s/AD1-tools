@@ -124,6 +124,8 @@ typedef struct ad1_session {
 
     ad1_file** ad1_files;
 
+    enum { NORMAL, VERBOSE, QUIET } mode;
+
 } ad1_session;
 
 enum category { HASH_INFO = 0x01, ITEM_TYPE = 0x02, ITEM_SIZE = 0x03, WINDOWS_FLAGS = 0x04, TIMESTAMP = 0x05 };

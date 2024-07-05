@@ -1,34 +1,16 @@
 #ifndef LIBAD1_ENCRYPT_H
 #define LIBAD1_ENCRYPT_H
 
-struct ad1_encrypted_header {
-    char signature[8];
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "libad1_definitions.h"
+#include "libad1_reader.h"
 
-    unsigned int version;
-    unsigned int total_size;
+ad1_encrypt_header* read_encrypt_header(FILE* encrypted_file);
 
-    short pass_count;
-    short raw_key_count;
-    short cert_count;
+void print_encrypt_header(ad1_encrypt_header* header);
 
-    unsigned short reserved;
-
-    unsigned int key_algorithm;
-    unsigned int hash_algorithm;
-
-    unsigned int iterations;
-
-    unsigned int salt_length;
-    unsigned int key_length;
-    unsigned int hmac_length;
-
-    unsigned char* salt;
-    unsigned char* key;
-    unsigned char* hmac;
-};
-
-enum encryption_algo { AES128, AES192, AES256 };
-
-enum encryption_hash { SHA256, SHA512 };
+char* hex_to_string(unsigned char* input, char* output, int length);
 
 #endif

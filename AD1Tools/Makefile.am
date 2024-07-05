@@ -8,7 +8,8 @@ bin_PROGRAMS = \
     ad1info \
     ad1verify \
     ad1extract \
-    ad1mount 
+    ad1mount \
+    ad1decrypt
 
 
 ad1info_SOURCES = \
@@ -36,4 +37,11 @@ ad1mount_SOURCES = \
     ad1mount.c ad1mount.h
 
 ad1mount_LDADD = \
+    libad1/libad1.la
+
+
+ad1decrypt_SOURCES = \
+    ad1decrypt.c ad1decrypt.h
+
+ad1decrypt_LDADD = \
     libad1/libad1.la

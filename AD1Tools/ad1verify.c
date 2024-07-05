@@ -18,7 +18,7 @@ static struct argp_option options[] = {
     {0}};
 
 struct arguments {
-    enum { NORMAL, VERBOSE, QUIET } mode;
+    enum { ARGNORMAL, ARGVERBOSE, ARGQUIET } mode;
 
     bool sha1;
     bool full_check;
@@ -63,6 +63,8 @@ main(int argc, char* argv[]) {
     ad1_session* session;
 
     session = open_ad1_session(arguments.ad1_file_path);
+
+    session->mode = arguments.mode;
 
     if (arguments.full_check) {
         if (!arguments.sha1) {
