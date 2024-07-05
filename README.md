@@ -1,5 +1,5 @@
 # AD1-tools
-Toolset to extract and mount an AD1 logical image.
+CLI Tools to open AccessData AD1 images on linux.
 
 See https://al3ks1s.fr/posts/adventures-part-1/ for explanations about the AD1 Format
 
