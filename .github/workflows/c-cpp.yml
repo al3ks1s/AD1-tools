@@ -13,6 +13,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Install dependencies
+      run: | 
+        sudo apt-get update
+        sudo apt-get install libfuse3-dev
     - name: aclocal
       run: aclocal --force -I m4 --install
     - name: autoconf
