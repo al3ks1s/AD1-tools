@@ -122,6 +122,8 @@ typedef struct ad1_session {
     ad1_segment_header* segment_header;
     ad1_logical_header* logical_header;
 
+    unsigned long item_number;
+
     ad1_file** ad1_files;
 
     enum { NORMAL, VERBOSE, QUIET } mode;

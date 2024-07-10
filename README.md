@@ -1,5 +1,14 @@
 # AD1-tools
-CLI Tools to open AccessData AD1 images on linux.
+CLI Tools to open AccessData AD1 forensic images on linux.
+
+Features :
+- File extraction
+- Digest verification
+- Segmented files handling
+- Filesystem mounting of images through FUSE
+
+Todo : 
+- Image decryption
 
 See https://al3ks1s.fr/posts/adventures-part-1/ for explanations about the AD1 Format
 

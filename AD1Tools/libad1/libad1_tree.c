@@ -35,6 +35,8 @@ build_metadata_list(ad1_session* session, ad1_item_header* item) {
 void
 build_next_items(ad1_session* session, ad1_item_header* previous_header) {
 
+    session->item_number += 1;
+
     if (previous_header->first_child_addr != 0) {
         previous_header->first_child = arbitrary_read_item(session, previous_header->first_child_addr);
         previous_header->first_child->parent = previous_header;
@@ -154,7 +156,7 @@ build_item_path(ad1_item_header* item) {
 
     path_length = get_path_length(item);
 
-    path = (char*)calloc(path_length + 1, sizeof(char));
+    path = calloc(path_length + 1, sizeof(char));
 
     if (item->parent != NULL) {
         recurse_item_path(item->parent, path);

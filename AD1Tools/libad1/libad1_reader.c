@@ -1,8 +1,11 @@
 #include "libad1_reader.h"
 #include <endian.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+pthread_mutex_t lock;
 
 void
 arbitrary_read(ad1_session* session, unsigned char* buf, unsigned long length, unsigned long offset) {
@@ -14,6 +17,10 @@ arbitrary_read(ad1_session* session, unsigned char* buf, unsigned long length, u
 
     unsigned long data_cursor =
         offset - (((session->segment_header->fragments_size * 65536) - AD1_LOGICAL_MARGIN) * file_cursor);
+
+    // Temporary mutex until i find a reading solution that doesn't explode on concurrent reads (Happens when mounting)
+    // Slows down reading big files a lot so i'll really need to figure something out
+    pthread_mutex_lock(&lock);
 
     while (toRead > 0) {
 
@@ -34,6 +41,8 @@ arbitrary_read(ad1_session* session, unsigned char* buf, unsigned long length, u
         data_cursor = 0;
         file_cursor += 1;
     }
+
+    pthread_mutex_unlock(&lock);
 }
 
 void
@@ -83,7 +92,7 @@ arbitrary_read_item(ad1_session* session, unsigned long offset) {
 
     ad1_item_header* item_header = NULL;
 
-    item_header = (ad1_item_header*)calloc(1, sizeof(ad1_item_header));
+    item_header = calloc(1, sizeof(ad1_item_header));
 
     item_header->next_item_addr = arbitrary_read_long_little_endian(session, offset);
     item_header->first_child_addr = arbitrary_read_long_little_endian(session, offset + 0x08);
@@ -93,7 +102,7 @@ arbitrary_read_item(ad1_session* session, unsigned long offset) {
     item_header->item_type = arbitrary_read_int_little_endian(session, offset + 0x28);
     item_header->item_name_length = arbitrary_read_int_little_endian(session, offset + 0x2c);
 
-    item_header->item_name = (unsigned char*)calloc(item_header->item_name_length + 1, sizeof(char));
+    item_header->item_name = calloc(item_header->item_name_length + 1, sizeof(char));
     arbitrary_read_ad1_string(session, item_header->item_name, item_header->item_name_length, offset + 0x30);
 
     // Transforming slashes into underscores so that it doesn't mess up file paths on extraction or mounting
@@ -113,14 +122,14 @@ ad1_metadata*
 arbitrary_read_metadata(ad1_session* session, unsigned long offset) {
 
     ad1_metadata* metadata = NULL;
-    metadata = (ad1_metadata*)calloc(1, sizeof(ad1_metadata));
+    metadata = calloc(1, sizeof(ad1_metadata));
 
     metadata->next_metadata_addr = arbitrary_read_long_little_endian(session, offset);
     metadata->category = arbitrary_read_int_little_endian(session, offset + 0x08);
     metadata->key = arbitrary_read_int_little_endian(session, offset + 0x0c);
     metadata->data_length = arbitrary_read_int_little_endian(session, offset + 0x10);
 
-    metadata->data = (unsigned char*)calloc(metadata->data_length + 1, sizeof(char));
+    metadata->data = calloc(metadata->data_length + 1, sizeof(char));
     arbitrary_read_ad1_string(session, metadata->data, metadata->data_length, offset + 0x14);
 
     return metadata;
@@ -200,7 +209,7 @@ read_segmented_header(FILE* ad1_file) {
     ad1_segment_header* segment_header = NULL;
 
     if (segment_header == NULL) {
-        segment_header = (ad1_segment_header*)calloc(1, sizeof(ad1_segment_header));
+        segment_header = calloc(1, sizeof(ad1_segment_header));
     }
 
     // Read signature
@@ -233,7 +242,7 @@ read_logical_header(FILE* ad1_file) {
 
     ad1_logical_header* logical_header = NULL;
 
-    logical_header = (ad1_logical_header*)calloc(1, sizeof(ad1_logical_header));
+    logical_header = calloc(1, sizeof(ad1_logical_header));
 
     read_string(ad1_file, logical_header->signature, 15, AD1_LOGICAL_MARGIN);
 
@@ -249,8 +258,7 @@ read_logical_header(FILE* ad1_file) {
     logical_header->attrguid_footer_addr = read_long_little_endian(ad1_file, 0x23c);
     logical_header->locsguid_footer_addr = read_long_little_endian(ad1_file, 0x24c);
 
-    logical_header->data_source_name = (unsigned char*)calloc(logical_header->data_source_name_length + 1,
-                                                              sizeof(char));
+    logical_header->data_source_name = calloc(logical_header->data_source_name_length + 1, sizeof(char));
     read_string(ad1_file, logical_header->data_source_name, logical_header->data_source_name_length, 0x25c);
 
     return logical_header;
@@ -265,7 +273,7 @@ read_item(FILE* ad1_file, unsigned long offset) {
 
     ad1_item_header* item_header = NULL;
 
-    item_header = (ad1_item_header*)calloc(1, sizeof(ad1_item_header));
+    item_header = calloc(1, sizeof(ad1_item_header));
 
     item_header->next_item_addr = read_long_little_endian(ad1_file, offset);
     item_header->first_child_addr = read_long_little_endian(ad1_file, offset + 0x08);
@@ -275,7 +283,7 @@ read_item(FILE* ad1_file, unsigned long offset) {
     item_header->item_type = read_int_little_endian(ad1_file, offset + 0x28);
     item_header->item_name_length = read_int_little_endian(ad1_file, offset + 0x2c);
 
-    item_header->item_name = (unsigned char*)calloc(item_header->item_name_length + 1, sizeof(char));
+    item_header->item_name = calloc(item_header->item_name_length + 1, sizeof(char));
     read_string(ad1_file, item_header->item_name, item_header->item_name_length, offset + 0x30);
 
     // Transforming slashes into underscores so that it doesn't mess up file paths on extraction or mounting
@@ -298,14 +306,14 @@ read_metadata(FILE* ad1_file, unsigned long offset) {
     }
 
     ad1_metadata* metadata = NULL;
-    metadata = (ad1_metadata*)calloc(1, sizeof(ad1_metadata));
+    metadata = calloc(1, sizeof(ad1_metadata));
 
     metadata->next_metadata_addr = read_long_little_endian(ad1_file, offset);
     metadata->category = read_int_little_endian(ad1_file, offset + 0x08);
     metadata->key = read_int_little_endian(ad1_file, offset + 0x0c);
     metadata->data_length = read_int_little_endian(ad1_file, offset + 0x10);
 
-    metadata->data = (unsigned char*)calloc(metadata->data_length + 1, sizeof(char));
+    metadata->data = calloc(metadata->data_length + 1, sizeof(char));
     read_string(ad1_file, metadata->data, metadata->data_length, offset + 0x14);
 
     return metadata;

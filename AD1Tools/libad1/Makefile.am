@@ -15,4 +15,5 @@ libad1_la_SOURCES = \
     libad1_tree.c libad1_tree.h
 
 libad1_la_LIBADD = \
-    @OPENSSL_LIBS@
+    @OPENSSL_LIBS@ \
+    -lfuse

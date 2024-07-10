@@ -46,7 +46,7 @@ extract_file(ad1_session* session, ad1_item_header* item, const char* output_dir
 
     output_dir_length = strlen(output_dir);
 
-    complete_path = (char*)calloc(output_dir_length + get_path_length(item) + 2, sizeof(char));
+    complete_path = calloc(output_dir_length + get_path_length(item) + 2, sizeof(char));
 
     memcpy(complete_path, output_dir, output_dir_length);
     complete_path[output_dir_length] = 47;
@@ -144,16 +144,4 @@ apply_metadata(const char* item_path, ad1_metadata* metadata) {
 
     utimensat(AT_FDCWD, item_path, times, 0);
     //utimes(item_path, times);
-}
-
-void
-parse_timestamp(struct timespec* time, const char* time_s) {
-
-    struct tm time_tm;
-
-    strptime(time_s, "%Y%m%dT%H%M%S", &time_tm);
-
-    time->tv_sec = mktime(&time_tm);
-
-    return;
 }

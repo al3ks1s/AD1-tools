@@ -11,7 +11,7 @@ read_encrypt_header(FILE* encrypted_file) {
     }
 
     ad1_encrypt_header* encrypt_header = NULL;
-    encrypt_header = (ad1_encrypt_header*)calloc(1, sizeof(ad1_encrypt_header));
+    encrypt_header = calloc(1, sizeof(ad1_encrypt_header));
 
     // Read signature
     fseek(encrypted_file, 0, SEEK_SET);
@@ -36,9 +36,9 @@ read_encrypt_header(FILE* encrypted_file) {
     encrypt_header->ekey_length = read_int_little_endian(encrypted_file, 0x28);
     encrypt_header->hmac_length = read_int_little_endian(encrypted_file, 0x2c);
 
-    encrypt_header->salt = (unsigned char*)calloc(encrypt_header->salt_length, sizeof(char));
-    encrypt_header->encrypted_key = (unsigned char*)calloc(encrypt_header->ekey_length, sizeof(char));
-    encrypt_header->hmac = (unsigned char*)calloc(encrypt_header->hmac_length, sizeof(char));
+    encrypt_header->salt = calloc(encrypt_header->salt_length, sizeof(char));
+    encrypt_header->encrypted_key = calloc(encrypt_header->ekey_length, sizeof(char));
+    encrypt_header->hmac = calloc(encrypt_header->hmac_length, sizeof(char));
 
     read_string(encrypted_file, encrypt_header->salt, encrypt_header->salt_length, 0x30);
     read_string(encrypted_file, encrypt_header->encrypted_key, encrypt_header->ekey_length,

@@ -45,3 +45,4 @@ ad1decrypt_SOURCES = \
 
 ad1decrypt_LDADD = \
     libad1/libad1.la
+

@@ -1,9 +1,14 @@
-#include "libad1_file_reader.h"
+#define _XOPEN_SOURCE 700
 #include <openssl/md5.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <time.h>
+#include <unistd.h>
 #include <zlib.h>
+#include "libad1_file_reader.h"
 
 unsigned char*
 read_file_data(ad1_session* session, ad1_item_header* ad1_item) {
@@ -13,11 +18,11 @@ read_file_data(ad1_session* session, ad1_item_header* ad1_item) {
     unsigned long data_index = 0;
 
     if (ad1_item->decompressed_size == 0) {
-        file_data = (unsigned char*)calloc(1, sizeof(unsigned char));
+        file_data = calloc(1, sizeof(unsigned char));
         return file_data;
     }
 
-    file_data = (unsigned char*)calloc(ad1_item->decompressed_size, sizeof(unsigned char));
+    file_data = calloc(ad1_item->decompressed_size, sizeof(unsigned char));
 
     chunk_numbers = arbitrary_read_long_little_endian(session, ad1_item->zlib_metadata_addr);
 
@@ -46,7 +51,7 @@ read_zlib_chunk(ad1_session* session, unsigned char* output_data_ptr, unsigned l
     unsigned char* compressed_data;
     unsigned long chunk_decompressed_size = 0;
 
-    compressed_data = (unsigned char*)calloc(zlib_chunk_size, sizeof(char));
+    compressed_data = calloc(zlib_chunk_size, sizeof(char));
 
     arbitrary_read(session, compressed_data, zlib_chunk_size, offset);
 
@@ -61,6 +66,7 @@ read_zlib_chunk(ad1_session* session, unsigned char* output_data_ptr, unsigned l
 long
 zlib_inflate(unsigned char* compressed_data, unsigned int compressed_data_size, unsigned char* output,
              unsigned long decompressed_size) {
+
     int ret;
     unsigned long have;
     z_stream strm;
@@ -93,4 +99,54 @@ zlib_inflate(unsigned char* compressed_data, unsigned int compressed_data_size, 
     (void)inflateEnd(&strm);
 
     return have;
+}
+
+void
+stat_ad1_file(ad1_session* session, ad1_item_header* ad1_item, struct stat* stbuf) {
+
+    stbuf->st_uid = getuid();
+    stbuf->st_gid = getgid();
+
+    stbuf->st_nlink = 1;
+
+    stbuf->st_size = ad1_item->decompressed_size;
+
+    if (ad1_item->item_type == AD1_FOLDER_SIGNATURE) {
+        stbuf->st_mode = S_IFDIR | 0555;
+    } else {
+        stbuf->st_mode = S_IFREG | 0440;
+    }
+
+    stbuf->st_blksize = 4096;
+    stbuf->st_blocks = 1;
+
+    ad1_metadata* metadata = ad1_item->first_metadata;
+
+    while (metadata != NULL) {
+
+        switch (metadata->category) {
+            case HASH_INFO: break;
+            case ITEM_TYPE: break;
+            case ITEM_SIZE: break;
+            case WINDOWS_FLAGS: break;
+            case TIMESTAMP:
+                switch (metadata->key) {
+                    case ACCESS: parse_timestamp(&stbuf->st_atim, metadata->data); break;
+                    case CHANGE: parse_timestamp(&stbuf->st_ctim, metadata->data); break;
+                    case MODIFIED: parse_timestamp(&stbuf->st_mtim, metadata->data); break;
+                };
+        }
+
+        metadata = metadata->next_metadata;
+    };
+}
+
+void
+parse_timestamp(struct timespec* time, const char* time_s) {
+
+    struct tm time_tm;
+
+    strptime(time_s, "%Y%m%dT%H%M%S", &time_tm);
+
+    time->tv_sec = mktime(&time_tm);
 }

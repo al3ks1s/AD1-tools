@@ -1,5 +1,7 @@
 #include "ad1mount.h"
 #include <argp.h>
+#include <fuse/fuse.h>
+#include <fuse/fuse_opt.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,6 +26,9 @@ struct arguments {
     char* mount_dir;
     char* ad1_file_path;
 };
+
+extern struct fuse_operations ad1_operations;
+extern ad1_session* fuse_session;
 
 static error_t
 parse_opt(int key, char* arg, struct argp_state* state) {
@@ -62,13 +67,22 @@ main(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    int argcc = 2;
+    char* argvv[2];
+
+    argvv[0] = argv[0];
+    argvv[1] = arguments.mount_dir;
+
     ad1_session* session;
 
     session = open_ad1_session(arguments.ad1_file_path);
 
     session->mode = arguments.mode;
 
-    close_ad1_session(session);
+    fuse_init(session);
+    fuse_main(argcc, argvv, &ad1_operations, 0);
+
+    //close_ad1_session(session);
 
     return 0;
 }

@@ -1,7 +1,9 @@
+#define _FILE_OFFSET_BITS 64
 #ifndef AD1_MOUNT_H
 #define AD1_MOUNT_H
 
 #include <stdbool.h>
+#include "libad1/libad1_fuse.h"
 #include "libad1/libad1_printer.h"
 #include "libad1/libad1_reader.h"
 #include "libad1/libad1_session.h"
