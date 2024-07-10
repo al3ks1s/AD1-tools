@@ -67,7 +67,7 @@ extract_file(ad1_session* session, ad1_item_header* item, const char* output_dir
             complete_path = NULL;
 
             switch (errno) {
-                case EACCES: printf("You don't have access to %s.", complete_path); break;
+                case EACCES: printf("You don't have access to %s.\n", complete_path); break;
                 case ELOOP: printf("Symlink loop on %s.\n", complete_path); break;
                 case EMLINK: printf("Link count exceeds max link count for path %s.\n", complete_path); break;
                 case EEXIST: break;

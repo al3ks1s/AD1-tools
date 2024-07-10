@@ -18,10 +18,6 @@ arbitrary_read(ad1_session* session, unsigned char* buf, unsigned long length, u
     unsigned long data_cursor =
         offset - (((session->segment_header->fragments_size * 65536) - AD1_LOGICAL_MARGIN) * file_cursor);
 
-    // Temporary mutex until i find a reading solution that doesn't explode on concurrent reads (Happens when mounting)
-    // Slows down reading big files a lot so i'll really need to figure something out
-    pthread_mutex_lock(&lock);
-
     while (toRead > 0) {
 
         unsigned long trunc_size_read = toRead;
@@ -30,19 +26,35 @@ arbitrary_read(ad1_session* session, unsigned char* buf, unsigned long length, u
             trunc_size_read = session->ad1_files[file_cursor]->size - data_cursor;
         }
 
+        /*
+         * Temporary mutex until i find a reading solution that doesn't explode on concurrent reads (Happens when mounting)
+         * Slows down reading big files a lot so i'll really need to figure something out
+         * Prolly needs to open files separately at each chunk read so that the seeks don't hinder each other.
+         * Would probably be a good idea to add caching so that i don't reread the same file over and over.
+        
+        FILE* cur_file = fopen(session->ad1_files[file_cursor]->filepath, "rb");
+        
+        fseek(session->ad1_files[file_cursor]->adfile, data_cursor + AD1_LOGICAL_MARGIN, SEEK_SET);
+        fread(&buf[char_cursor], 1, trunc_size_read, session->ad1_files[file_cursor]->adfile);
+        
+        fseek(cur_file, data_cursor + AD1_LOGICAL_MARGIN, SEEK_SET);
+        fread(&buf[char_cursor], 1, trunc_size_read, cur_file);
+
+        fclose(cur_file);
+         */
+
+        pthread_mutex_lock(&lock);
+
         fseek(session->ad1_files[file_cursor]->adfile, data_cursor + AD1_LOGICAL_MARGIN, SEEK_SET);
         fread(&buf[char_cursor], 1, trunc_size_read, session->ad1_files[file_cursor]->adfile);
 
-        //printf("Reading %d bytes of data in file %d, from %x address. %d bytes remaining\n", trunc_size_read,
-        //       file_cursor, data_cursor, toRead);
+        pthread_mutex_unlock(&lock);
 
         char_cursor += trunc_size_read;
         toRead -= trunc_size_read;
         data_cursor = 0;
         file_cursor += 1;
     }
-
-    pthread_mutex_unlock(&lock);
 }
 
 void

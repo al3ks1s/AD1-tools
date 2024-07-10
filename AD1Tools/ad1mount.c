@@ -3,7 +3,6 @@
 #include <fuse/fuse.h>
 #include <fuse/fuse_opt.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 const char* argp_program_version = "ad1mount v.0.1.0";

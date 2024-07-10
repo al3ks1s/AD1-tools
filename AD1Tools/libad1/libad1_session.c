@@ -61,6 +61,8 @@ open_ad1_session(char* filepath) {
 
         fseek(session->ad1_files[i - 1]->adfile, 0, SEEK_END);
         session->ad1_files[i - 1]->size = ftell(session->ad1_files[i - 1]->adfile) - AD1_LOGICAL_MARGIN;
+
+        //fclose(session->ad1_files[i - 1]->adfile);
     }
     build_item_tree(session);
 
