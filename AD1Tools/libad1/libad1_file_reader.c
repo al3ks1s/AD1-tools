@@ -28,7 +28,7 @@ free_cache() {
     }
 }
 
-// This ass is *not* a good cache algorithm
+// This ass is *not* a good cache algorithm, feel free to make one better
 ad1_cache_entry*
 search_cache(ad1_session* session, ad1_item_header* ad1_item) {
 
