@@ -1,5 +1,6 @@
 #define _XOPEN_SOURCE 700
 #include <openssl/md5.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,6 +10,72 @@
 #include <unistd.h>
 #include <zlib.h>
 #include "libad1_file_reader.h"
+
+ad1_cache_entry ad1_file_cache[CACHE_SIZE];
+
+pthread_mutex_t cache_lock;
+
+void
+free_cache() {
+
+    for (int i = 0; i < CACHE_SIZE; i++) {
+        if (ad1_file_cache[i].data != 0) {
+            free(ad1_file_cache[i].data);
+        }
+        ad1_file_cache[i].counter = 0;
+        ad1_file_cache[i].data = 0;
+        ad1_file_cache[i].cached_item = 0;
+    }
+}
+
+// This ass is *not* a good cache algorithm
+ad1_cache_entry*
+search_cache(ad1_session* session, ad1_item_header* ad1_item) {
+
+    pthread_mutex_lock(&cache_lock);
+
+    for (int i = 0; i < CACHE_SIZE; i++) {
+
+        if (ad1_file_cache[i].cached_item == ad1_item) {
+
+            ad1_file_cache[i].counter++;
+
+            pthread_mutex_unlock(&cache_lock);
+            return &ad1_file_cache[i];
+        } else if (ad1_file_cache[i].counter > 0) {
+            ad1_file_cache[i].counter--;
+        }
+
+        if (ad1_file_cache[i].counter == 0 && ad1_file_cache[i].cached_item != 0) {
+            free(ad1_file_cache[i].data);
+            ad1_file_cache[i].data = 0;
+            ad1_file_cache[i].cached_item = 0;
+            ad1_file_cache[i].counter = 0;
+        }
+    }
+
+    pthread_mutex_unlock(&cache_lock);
+    return 0;
+}
+
+void
+cache_data(ad1_item_header* ad1_item, unsigned char* data) {
+
+    pthread_mutex_lock(&cache_lock);
+
+    for (int i = 0; i < CACHE_SIZE; i++) {
+        if (ad1_file_cache[i].counter == 0) {
+            ad1_file_cache[i].counter = 1;
+            ad1_file_cache[i].cached_item = ad1_item;
+            ad1_file_cache[i].data = data;
+
+            pthread_mutex_unlock(&cache_lock);
+            return;
+        }
+    }
+
+    pthread_mutex_unlock(&cache_lock);
+}
 
 unsigned char*
 read_file_data(ad1_session* session, ad1_item_header* ad1_item) {
@@ -20,6 +87,12 @@ read_file_data(ad1_session* session, ad1_item_header* ad1_item) {
     if (ad1_item->decompressed_size == 0) {
         file_data = calloc(1, sizeof(unsigned char));
         return file_data;
+    }
+
+    ad1_cache_entry* cached_item = search_cache(session, ad1_item);
+
+    if (cached_item != 0) {
+        return cached_item->data;
     }
 
     file_data = calloc(ad1_item->decompressed_size, sizeof(unsigned char));
@@ -40,6 +113,8 @@ read_file_data(ad1_session* session, ad1_item_header* ad1_item) {
         data_index += read_zlib_chunk(session, file_data + data_index, addresses[i], addresses[i + 1] - addresses[i],
                                       ad1_item->decompressed_size);
     }
+
+    cache_data(ad1_item, file_data);
 
     return file_data;
 }

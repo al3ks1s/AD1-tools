@@ -4,9 +4,13 @@
 #include <string.h>
 
 ad1_session*
-open_ad1_session(char* filepath) {
+open_ad1_session(char* filep) {
 
     // Don't forget to close the session after you're done with the file, or else you'll leak a lot of memory.
+
+    char filepath[256];
+
+    realpath(filep, filepath);
 
     ad1_session* session;
 
@@ -71,6 +75,8 @@ open_ad1_session(char* filepath) {
 
 void
 close_ad1_session(ad1_session* session) {
+
+    //free_cache();
 
     free_all(session->segment_header, session->logical_header);
 

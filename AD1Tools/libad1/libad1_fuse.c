@@ -113,7 +113,7 @@ ad1_read(const char* path, char* buf, size_t size, off_t offset, struct fuse_fil
 
     memcpy(buf, data + offset, data_size);
 
-    free(data);
+    //free(data);
 
     return data_size;
 }
@@ -152,8 +152,10 @@ ad1_readdir(const char* path, void* buffer, fuse_fill_dir_t filler, off_t offset
 
 int
 fuse_init(ad1_session* ad_session) {
+
     fuse_session = ad_session;
     build_item_array();
+
     return 0;
 }
 

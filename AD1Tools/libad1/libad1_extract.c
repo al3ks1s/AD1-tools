@@ -14,7 +14,7 @@
 void
 extract_all(ad1_session* session, const char* output_dir) {
 
-    printf("Extracting files");
+    printf("Extracting files\n");
 
     if (mkdir(output_dir, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP) == -1) {
         switch (errno) {
@@ -33,6 +33,8 @@ extract_all(ad1_session* session, const char* output_dir) {
     }
 
     extract_file(session, session->logical_header->first_item, output_dir);
+
+    printf("Finished extracting");
 }
 
 void
@@ -51,10 +53,6 @@ extract_file(ad1_session* session, ad1_item_header* item, const char* output_dir
     memcpy(complete_path, output_dir, output_dir_length);
     complete_path[output_dir_length] = 47;
     memcpy(complete_path + output_dir_length + 1, local_item_path, get_path_length(item));
-
-    //printf("\rExtracting : %s", item->item_name);
-    //fflush(stdout);
-    //*/
 
     // There's probably a lot to improve on that one, like the program not extracting files next to a folder it doesn't manage to create, not gonna do that today tho
     if (item->item_type == AD1_FOLDER_SIGNATURE) {
@@ -98,7 +96,7 @@ extract_file(ad1_session* session, ad1_item_header* item, const char* output_dir
             printf("Couldn't create file : %s\n", complete_path);
         }
 
-        free(file_data);
+        //free(file_data);
     }
 
     if (item->first_child != NULL) {

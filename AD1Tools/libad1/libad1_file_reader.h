@@ -7,6 +7,20 @@
 #include "libad1_definitions.h"
 #include "libad1_reader.h"
 
+#define CACHE_SIZE 25
+
+typedef struct ad1_cache_entry {
+    unsigned int counter;
+    ad1_item_header* cached_item;
+    unsigned char* data;
+} ad1_cache_entry;
+
+ad1_cache_entry* search_cache(ad1_session* session, ad1_item_header* ad1_item);
+
+void cache_data(ad1_item_header* ad1_item, unsigned char* data);
+
+void free_cache();
+
 unsigned char* read_file_data(ad1_session* session, ad1_item_header* ad1_item);
 
 long read_zlib_chunk(ad1_session* session, unsigned char* output_data_ptr, unsigned long offset,

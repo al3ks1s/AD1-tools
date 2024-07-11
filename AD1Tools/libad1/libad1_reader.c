@@ -31,17 +31,19 @@ arbitrary_read(ad1_session* session, unsigned char* buf, unsigned long length, u
          * Slows down reading big files a lot so i'll really need to figure something out
          * Prolly needs to open files separately at each chunk read so that the seeks don't hinder each other.
          * Would probably be a good idea to add caching so that i don't reread the same file over and over.
-        
+         * IT WORKS, Now the question is : Which is faster | the mutex is, caching will really be needed | goddam it speeds up things
+         * Now that the latest searches are 
+         */
+
+        /*
         FILE* cur_file = fopen(session->ad1_files[file_cursor]->filepath, "rb");
-        
-        fseek(session->ad1_files[file_cursor]->adfile, data_cursor + AD1_LOGICAL_MARGIN, SEEK_SET);
-        fread(&buf[char_cursor], 1, trunc_size_read, session->ad1_files[file_cursor]->adfile);
-        
+
         fseek(cur_file, data_cursor + AD1_LOGICAL_MARGIN, SEEK_SET);
         fread(&buf[char_cursor], 1, trunc_size_read, cur_file);
 
         fclose(cur_file);
-         */
+
+        //*/
 
         pthread_mutex_lock(&lock);
 
@@ -49,6 +51,7 @@ arbitrary_read(ad1_session* session, unsigned char* buf, unsigned long length, u
         fread(&buf[char_cursor], 1, trunc_size_read, session->ad1_files[file_cursor]->adfile);
 
         pthread_mutex_unlock(&lock);
+        //*/
 
         char_cursor += trunc_size_read;
         toRead -= trunc_size_read;
