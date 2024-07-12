@@ -5,4 +5,3 @@ autoconf --force
 libtoolize --force
 automake --add-missing
 
-./configure
