@@ -1,4 +1,4 @@
-AC_INIT([AD1tools], [0.1], [al3ks1sss@gmail.com])
+AC_INIT([AD1tools], [1.0], [al3ks1sss@gmail.com])
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_MACRO_DIRS([m4])

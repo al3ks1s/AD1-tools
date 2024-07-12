@@ -8,7 +8,7 @@ open_ad1_session(char* filep) {
 
     // Don't forget to close the session after you're done with the file, or else you'll leak a lot of memory.
 
-    char filepath[256];
+    char filepath[256] = {0};
 
     realpath(filep, filepath);
 
@@ -19,7 +19,7 @@ open_ad1_session(char* filep) {
     FILE* headers_file = fopen(filepath, "rb");
 
     if (headers_file == NULL) {
-        printf("Couldn't open file");
+        printf("Couldn't open file %s\n", filep);
         free(session);
         session = 0;
         exit(EXIT_FAILURE);
@@ -37,7 +37,7 @@ open_ad1_session(char* filep) {
     fclose(headers_file);
 
     session->ad1_files = calloc(session->segment_header->segment_number, sizeof(ad1_file*));
-    unsigned long total = 0;
+
     for (int i = 1; i <= session->segment_header->segment_number; i++) {
 
         session->ad1_files[i - 1] = calloc(1, sizeof(ad1_file));
@@ -47,7 +47,7 @@ open_ad1_session(char* filep) {
         sprintf(extension, "%d", i);
         int extension_length = strlen(extension);
 
-        session->ad1_files[i - 1]->filepath = calloc(strlen(filepath) + extension_length - 1, sizeof(char));
+        session->ad1_files[i - 1]->filepath = calloc(strlen(filepath) + extension_length, sizeof(char));
         strcpy(session->ad1_files[i - 1]->filepath, filepath);
         memcpy(session->ad1_files[i - 1]->filepath + strlen(filepath) - 1, extension, extension_length);
 
@@ -76,9 +76,7 @@ open_ad1_session(char* filep) {
 void
 close_ad1_session(ad1_session* session) {
 
-    //free_cache();
-
-    free_all(session->segment_header, session->logical_header);
+    free_cache();
 
     for (int i = 0; i < session->segment_header->segment_number; i++) {
 
@@ -88,6 +86,8 @@ close_ad1_session(ad1_session* session) {
     }
 
     free(session->ad1_files);
+
+    free_all(session->segment_header, session->logical_header);
 
     free(session);
 }

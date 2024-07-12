@@ -2,6 +2,7 @@
 #include <openssl/evp.h>
 #include <openssl/md5.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "libad1_tree.h"
 
@@ -125,11 +126,15 @@ recurse_md5(ad1_session* session, ad1_item_header* item) {
     if (item->item_type != AD1_FOLDER_SIGNATURE) {
         ret = check_md5(session, item);
 
+        char* item_path = build_item_path(item);
+
         switch (ret) {
-            case HASH_OK: printf("MD5 OK for file : %s\n", build_item_path(item)); break;
-            case HASH_ERR: printf("MD5 ERROR for file : %s\n", build_item_path(item)); break;
-            case HASH_NOK: printf("MD5 NOK for file : %s\n", build_item_path(item)); break;
+            case HASH_OK: printf("MD5 OK for file : %s\n", item_path); break;
+            case HASH_ERR: printf("MD5 ERROR for file : %s\n", item_path); break;
+            case HASH_NOK: printf("MD5 NOK for file : %s\n", item_path); break;
         }
+
+        free(item_path);
     }
 
     if (item->first_child != 0) {
@@ -150,11 +155,15 @@ recurse_sha1(ad1_session* session, ad1_item_header* item) {
     if (item->item_type != AD1_FOLDER_SIGNATURE) {
         ret = check_sha1(session, item);
 
+        char* item_path = build_item_path(item);
+
         switch (ret) {
-            case HASH_OK: printf("SHA1 OK for file : %s\n", build_item_path(item)); break;
-            case HASH_ERR: printf("SHA1 ERROR for file : %s\n", build_item_path(item)); break;
-            case HASH_NOK: printf("SHA1 NOK for file : %s\n", build_item_path(item)); break;
+            case HASH_OK: printf("SHA1 OK for file : %s\n", item_path); break;
+            case HASH_ERR: printf("SHA1 ERROR for file : %s\n", item_path); break;
+            case HASH_NOK: printf("SHA1 NOK for file : %s\n", item_path); break;
         }
+
+        free(item_path);
     }
 
     if (item->first_child != 0) {

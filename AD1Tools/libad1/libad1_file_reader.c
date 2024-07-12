@@ -65,7 +65,7 @@ cache_data(ad1_item_header* ad1_item, unsigned char* data) {
 
     for (int i = 0; i < CACHE_SIZE; i++) {
         if (ad1_file_cache[i].counter == 0) {
-            ad1_file_cache[i].counter = 1;
+            ad1_file_cache[i].counter = 3;
             ad1_file_cache[i].cached_item = ad1_item;
             ad1_file_cache[i].data = data;
 
@@ -217,11 +217,12 @@ stat_ad1_file(ad1_session* session, ad1_item_header* ad1_item, struct stat* stbu
 }
 
 void
-parse_timestamp(struct timespec* time, const char* time_s) {
+parse_timestamp(struct timespec* time_p, const char* time_s) {
 
-    struct tm time_tm;
+    time_t timestamp = time(NULL);
+    struct tm* time_tm = localtime(&timestamp);
 
-    strptime(time_s, "%Y%m%dT%H%M%S", &time_tm);
+    strptime(time_s, "%Y%m%dT%H%M%S", time_tm);
 
-    time->tv_sec = mktime(&time_tm);
+    time_p->tv_sec = mktime(time_tm);
 }
