@@ -37,6 +37,8 @@ ad1_item_header* path_to_item(const char*);
 
 int ad1_getattr(const char* path, struct stat* stbuf);
 
+int ad1_readlink(const char* path, char* buf, size_t target_size);
+
 int ad1_open(const char* path, struct fuse_file_info* fi);
 
 int ad1_read(const char* path, char* buf, size_t size, off_t offset, struct fuse_file_info* fi);

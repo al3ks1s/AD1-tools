@@ -64,6 +64,8 @@ extract_file(ad1_session* session, ad1_item_header* item, const char* output_dir
             free(complete_path);
             complete_path = NULL;
 
+            printf("Errno mkdir : %d\n", errno);
+
             switch (errno) {
                 case EACCES: printf("You don't have access to %s.\n", complete_path); break;
                 case ELOOP: printf("Symlink loop on %s.\n", complete_path); break;
@@ -93,6 +95,7 @@ extract_file(ad1_session* session, ad1_item_header* item, const char* output_dir
 
             fclose(output_file);
         } else {
+            printf("Errno : %d\n", errno);
             printf("Couldn't create file : %s\n", complete_path);
         }
 

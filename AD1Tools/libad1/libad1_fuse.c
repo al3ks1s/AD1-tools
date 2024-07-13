@@ -87,6 +87,21 @@ ad1_getattr(const char* path, struct stat* stbuf) {
 }
 
 int
+ad1_readlink(const char* path, char* buf, size_t target_size) {
+    return -ENOENT;
+
+    ad1_item_header* item = path_to_item(path);
+
+    if (item == 0) {
+        return -ENOENT;
+    }
+
+    strcpy(buf, item->item_name);
+
+    return 0;
+}
+
+int
 ad1_open(const char* path, struct fuse_file_info* fi) {
 
     ad1_item_header* item = path_to_item(path);
@@ -161,6 +176,7 @@ fuse_init(ad1_session* ad_session) {
 
 void
 ad1_destroy(void* private_data) {
+
     for (int i = 0; i < fuse_session->item_number; i++) {
         free(item_array[i].path);
     }
@@ -170,5 +186,9 @@ ad1_destroy(void* private_data) {
     close_ad1_session(fuse_session);
 }
 
-struct fuse_operations ad1_operations = {
-    .getattr = ad1_getattr, .open = ad1_open, .read = ad1_read, .readdir = ad1_readdir, .destroy = ad1_destroy};
+struct fuse_operations ad1_operations = {.getattr = ad1_getattr,
+                                         .open = ad1_open,
+                                         .read = ad1_read,
+                                         .readdir = ad1_readdir,
+                                         .destroy = ad1_destroy,
+                                         .readlink = ad1_readlink};

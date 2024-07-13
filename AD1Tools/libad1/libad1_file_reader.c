@@ -47,6 +47,7 @@ search_cache(ad1_session* session, ad1_item_header* ad1_item) {
         }
 
         if (ad1_file_cache[i].counter == 0 && ad1_file_cache[i].cached_item != 0) {
+
             free(ad1_file_cache[i].data);
             ad1_file_cache[i].data = 0;
             ad1_file_cache[i].cached_item = 0;
@@ -65,7 +66,8 @@ cache_data(ad1_item_header* ad1_item, unsigned char* data) {
 
     for (int i = 0; i < CACHE_SIZE; i++) {
         if (ad1_file_cache[i].counter == 0) {
-            ad1_file_cache[i].counter = 3;
+
+            ad1_file_cache[i].counter = 5;
             ad1_file_cache[i].cached_item = ad1_item;
             ad1_file_cache[i].data = data;
 
@@ -199,9 +201,24 @@ stat_ad1_file(ad1_session* session, ad1_item_header* ad1_item, struct stat* stbu
 
     while (metadata != NULL) {
 
+        /*
+        FILE* log = fopen("/home/al3ks1s/Projets/AD1-tools/build/log.txt", "a");
+        fprintf(log, "%s %x %x %s\n", ad1_item->item_name, metadata->category, metadata->key, metadata->data);
+        fclose(log);
+        //*/
         switch (metadata->category) {
             case HASH_INFO: break;
-            case ITEM_TYPE: break;
+            case ITEM_TYPE:
+                if (metadata->key == CHAR_ITEM_TYPE) {
+                    switch (*(int*)metadata->data) {
+                        case REFULAR_FILE: stbuf->st_mode = S_IFREG | 0440; break;
+                        case PLACEHOLDER: stbuf->st_mode = S_IFDIR | 0555; break;
+                        case REGULAR_FOLDER: stbuf->st_mode = S_IFDIR | 0555; break;
+                        case FILESYSTEM_METADATA: stbuf->st_mode = S_IFDIR | 0555; break;
+                        case FILESLACK: stbuf->st_mode = S_IFREG | 0440; break;
+                        case SYMLINK: stbuf->st_mode = S_IFREG | 0440; break; // Putting symlink as reg files for now
+                    }
+                }
             case ITEM_SIZE: break;
             case WINDOWS_FLAGS: break;
             case TIMESTAMP:
