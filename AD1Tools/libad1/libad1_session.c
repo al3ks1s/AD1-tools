@@ -2,13 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 ad1_session*
 open_ad1_session(char* filep) {
 
     // Don't forget to close the session after you're done with the file, or else you'll leak a lot of memory.
 
-    char filepath[256] = {0};
+    char filepath[PATH_MAX] = {0};
 
     realpath(filep, filepath);
 
