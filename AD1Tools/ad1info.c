@@ -53,7 +53,11 @@ print_info(ad1_session* session) {
     printf("\n");
 
     if (arguments.tree) {
-        print_tree(session->logical_header->first_item, 0);
+        /* print_tree() emits (cur_depth_level - 1) indents, so starting at 0
+           renders the first two levels of the tree identically, both flush
+           left. Starting at 1 maps indent width 1:1 onto tree depth, which
+           lets the output be parsed back into full paths. */
+        print_tree(session->logical_header->first_item, 1);
     }
 }
 

@@ -10,17 +10,39 @@ pthread_mutex_t lock;
 void
 arbitrary_read(ad1_session* session, unsigned char* buf, unsigned long length, unsigned long offset) {
     unsigned long toRead = length;
-    unsigned int char_cursor = 0;
+    unsigned long char_cursor = 0;
 
-    unsigned int file_cursor =
-        (unsigned int)(offset / ((session->segment_header->fragments_size * 65536) - AD1_LOGICAL_MARGIN));
+    /* fragments_size is an unsigned int, so (fragments_size * 65536 - MARGIN)
+       is evaluated in 32-bit arithmetic. Multiplying that by file_cursor wraps
+       modulo 2^32 once file_cursor >= 3, which corrupts data_cursor for every
+       offset past roughly 4.7GB. The bad data_cursor then underflows
+       trunc_size_read below and drives fread far past the caller's buffer.
+       Widening to unsigned long keeps the whole expression 64-bit. */
+    const unsigned long segment_data_size =
+        ((unsigned long)session->segment_header->fragments_size * 65536UL) - (unsigned long)AD1_LOGICAL_MARGIN;
 
-    unsigned long data_cursor =
-        offset - (((session->segment_header->fragments_size * 65536) - AD1_LOGICAL_MARGIN) * file_cursor);
+    unsigned int file_cursor = (unsigned int)(offset / segment_data_size);
+
+    unsigned long data_cursor = offset - (segment_data_size * (unsigned long)file_cursor);
 
     while (toRead > 0) {
 
         unsigned long trunc_size_read = toRead;
+
+        /* Fail loudly instead of indexing past the end of the segment array. */
+        if (file_cursor >= session->segment_header->segment_number) {
+            fprintf(stderr,
+                    "arbitrary_read: segment %u out of range (image has %u) for offset %lu\n",
+                    file_cursor, session->segment_header->segment_number, offset);
+            return;
+        }
+
+        if (data_cursor >= session->ad1_files[file_cursor]->size) {
+            fprintf(stderr,
+                    "arbitrary_read: cursor %lu past end of segment %u\n",
+                    data_cursor, file_cursor);
+            return;
+        }
 
         if (toRead + data_cursor > session->ad1_files[file_cursor]->size) {
             trunc_size_read = session->ad1_files[file_cursor]->size - data_cursor;
