@@ -19,7 +19,7 @@ See https://al3ks1s.fr/posts/adventures-part-1/ for explanations about the AD1 F
 
 Grab the [latest release](https://github.com/al3ks1s/AD1-tools/releases)
 ```
-dpkg --install ad1tools_1.0.0-1_amd64.deb
+dpkg --install ad1tools_1.0.1-1_amd64.deb
 ```
 
 #### Install from Git

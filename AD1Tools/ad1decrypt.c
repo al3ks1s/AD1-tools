@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "ad1decrypt.h"
 
-const char* argp_program_version = "ad1decrypt v0.1.0";
+const char* argp_program_version = "ad1decrypt v1.0.1";
 const char* argp_program_bug_address = "<al3ks1sss@gmail.com> or https://github.com/al3ks1s/AD1-tools/issues";
 static char doc[] = "Print important information of an AccessData AD1 Logical Image.";
 static char args_doc[] = "ad1decrypt [OPTIONS] -i FILENAME";
