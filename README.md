@@ -87,7 +87,7 @@ Extract the content of an AccessData AD1 Logical Image.
 Mounts an AccessData AD1 Logical Image as a read only filesystem.
 
   -i, --input=FILE           Input AD1 file.
-  -m, --mnt=DIR              Inout AD1 file.
+  -m, --mnt=DIR              Mount target.
   -q, --quiet                Produce a quiet output.
   -v, --verbose              Blurt a lotta text.
   -?, --help                 Give this help list

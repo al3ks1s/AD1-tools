@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-const char* argp_program_version = "ad1mount v.0.1.0";
+const char* argp_program_version = "ad1mount v1.0.1";
 const char* argp_program_bug_address = "<al3ks1sss@gmail.com> or https://github.com/al3ks1s/AD1-tools/issues";
 static char doc[] = "Mounts an AccessData AD1 Logical Image as a read only filesystem.";
 static char args_doc[] = "ad1verify [OPTIONS] -i FILENAME";
@@ -13,7 +13,7 @@ static char args_doc[] = "ad1verify [OPTIONS] -i FILENAME";
 static struct argp_option options[] = {{"verbose", 'v', 0, OPTION_ARG_OPTIONAL, "Blurt a lotta text."},
                                        {"quiet", 'q', 0, OPTION_ARG_OPTIONAL, "Produce a quiet output."},
                                        {"input", 'i', "FILE", 0, "Input AD1 file."},
-                                       {"mnt", 'm', "DIR", 0, "Inout AD1 file."},
+                                       {"mnt", 'm', "DIR", 0, "Mount target."},
                                        {0}};
 
 struct arguments {
