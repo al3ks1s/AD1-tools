@@ -49,10 +49,10 @@ extract_file(ad1_session* session, ad1_item_header* item, const char* output_dir
             free(local_item_path);
             local_item_path = NULL;
 
-            free(complete_path);
-            complete_path = NULL;
-
             handle_fs_error(errno, complete_path);
+            
+	    free(complete_path);
+            complete_path = NULL;
 
             return;
         }
